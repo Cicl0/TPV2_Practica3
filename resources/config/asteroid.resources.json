@@ -1,0 +1,29 @@
+{
+
+  "fonts" : [
+    { "id" : "ARIAL16", "file" : "resources/fonts/ARIAL.ttf", "size": 16 },
+    { "id" : "ARIAL24", "file" : "resources/fonts/ARIAL.ttf", "size": 24 }
+  ],
+  
+  "images" : [
+    { "id" : "heart", "file" : "resources/images/heart.png"},
+    { "id" : "pac_sheet", "file" : "resources/images/pacman_sprites.png"}
+  ],
+  
+  "messages" : [
+    { "id" : "start", "text" : "Press any key to start a new game", "font" : "ARIAL24", "color" : "0x441155ff"},
+    { "id" : "start_round", "text" : "Press ENTER to start the round", "font" : "ARIAL24", "color" : "0x441155ff"},
+    { "id" : "continue", "text" : "Press space to continue", "font" : "ARIAL24", "color" : "0x112233ff", "bg" : "0xffffffff" },
+    { "id" : "dead", "text" : "Game Over Loser! Press ENTER to continue.", "font" : "ARIAL24", "color" : "0x0000ffff" },
+    { "id" : "win", "text" : "Game Over Champion! Press ENTER to continue.", "font" : "ARIAL24", "color" : "0x0000ffff" },
+    { "id" : "pause", "text" : "Press any key to resume the game", "font" : "ARIAL24", "color" : "0x441155ff"}
+  ],
+  
+  "sounds" : [
+    { "id" : "explosion", "file" : "resources/sound/explosion.wav" },
+    { "id" : "gunshot", "file" : "resources/sound/gunshot.wav" },
+    { "id" : "thrust", "file" : "resources/sound/thrust.wav" },
+    { "id" : "thrust1", "file" : "resources/sound/thrust1.wav" }
+  ]
+
+}

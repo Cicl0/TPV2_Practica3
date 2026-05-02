@@ -1,50 +1,17 @@
-﻿// This file is part of the course TPV2@UCM - Samir Genaim
+// This file is part of the course TPV2@UCM - Samir Genaim
 
 #include "Game.h"
 
-#include "../components/PacManComponent.h"
-#include "../components/Transform.h"
-#include "../ecs/EntityManager.h"
 #include "../sdlutils/InputHandler.h"
 #include "../sdlutils/SDLUtils.h"
-#include "../systems/CollisionsSystem.h"
-#include "../systems/GameCtrlSystem.h"
-#include "../systems/PacManSystem.h"
-#include "../systems/RenderSystem.h"
-#include "../systems/FoodSystem.h"
-#include "../systems/GhostSystem.h"
-#include "../systems/ImmunitySystem.h"
-#include "../utils/Vector2D.h"
-#include "../utils/Collisions.h"
-#include "../game/ecs_defs.h"
-
-#include "PausedState.h"
-#include "RunningState.h"
-#include "NewGameState.h"
-#include "NewRoundState.h"
-#include "GameOverState.h"
-
-using ecs::EntityManager;
+#include "LittleWolf.h"
 
 Game::Game() :
-		_mngr(), //
-		_pacmanSys(), //
-		_renderSys(), //
-		_collisionSys(), //
-		_foodSys(), //
-		_ghostSys(), //
-		_immunitySys(),
-		_state(nullptr),
-		_paused_state(nullptr),
-		_runing_state(nullptr),
-		_newgame_state(nullptr),
-		_newround_state(nullptr),
-		_gameover_state(nullptr) {
-
+		_little_wolf() //
+{
 }
 
 Game::~Game() {
-	delete _mngr;
 
 	// release InputHandler if the instance was created correctly.
 	if (InputHandler::HasInstance())
@@ -53,13 +20,23 @@ Game::~Game() {
 	// release SLDUtil if the instance was created correctly.
 	if (SDLUtils::HasInstance())
 		SDLUtils::Release();
+
+	delete _little_wolf;
 }
 
-void Game::initGame() {
+void Game::init(const char *map) {
+
+
+	_little_wolf = new LittleWolf();
+
+	// load a map
+	_little_wolf->load(map);
 
 	// initialize the SDL singleton
-	if (!SDLUtils::Init("PacMan, Stars, ...", 800, 600,
-			"resources/config/asteroid.resources.json")) {
+	if (!SDLUtils::Init("[Little Wolf: " + std::string(map) + "]",
+			_little_wolf->get_xres(),
+			_little_wolf->get_yres(),
+			"resources/config/littlewolf.resources.json")) {
 
 		std::cerr << "Something went wrong while initializing SDLUtils"
 				<< std::endl;
@@ -74,41 +51,14 @@ void Game::initGame() {
 
 	}
 
-	// Create the manager
-	_mngr = new EntityManager();
+	_little_wolf->init(sdlutils().window(), sdlutils().renderer());
 
-	// add the systems
-	_pacmanSys = _mngr->addSystem<PacManSystem>();
-	_renderSys = _mngr->addSystem<RenderSystem>();
-	_collisionSys = _mngr->addSystem<CollisionsSystem>();
-	_foodSys = _mngr->addSystem<FoodSystem>();
-	_ghostSys =	_mngr->addSystem<GhostSystem>();
-	_immunitySys = _mngr->addSystem<ImmunitySystem>();
-	_gameCtrlSys = _mngr->addSystem<GameCtrlSystem>();
-	static_cast<GameCtrlSystem*>(_gameCtrlSys)->setGame(this);
-	// create a visible PacMan entity so movement/render can be tested immediately
-	auto pacman = _mngr->addEntity();
-	_mngr->addComponent<Transform>(
-			pacman,
-			Vector2D(sdlutils().width() / 2.0f - 24.0f, sdlutils().height() / 2.0f - 24.0f),
-			Vector2D(0.0f, 0.0f),
-			48.0f,
-			48.0f,
-			0.0f);
-	_mngr->addComponent<PacManComponent>(pacman, 3);
-	_mngr->setHandler(ecs::hdlr::PACMAN, pacman);
+	// add some players
+	_little_wolf->addPlayer(0);
+	_little_wolf->addPlayer(1);
+	_little_wolf->addPlayer(2);
+	_little_wolf->addPlayer(3);
 
-	static_cast<PacManSystem*>(_pacmanSys)->setPacMan(pacman);
-
-	// Creacion de estados
-	_paused_state = new PausedState(this);
-	_runing_state = new RunningState(this);
-	_newgame_state = new NewGameState(this);
-	_newround_state = new NewRoundState(this);
-	_gameover_state = new GameOverState(this);
-
-	_state = _newgame_state;
-	_state->enter();
 }
 
 void Game::start() {
@@ -119,22 +69,34 @@ void Game::start() {
 	auto &ihdlr = ih();
 
 	while (!exit) {
-		Uint64 startTime = sdlutils().currRealTime();
+		Uint32 startTime = sdlutils().currRealTime();
 
 		// refresh the input handler
 		ihdlr.refresh();
 
-		if (ihdlr.isKeyDown(SDL_SCANCODE_ESCAPE)) {
-			exit = true;
-			continue;
+		if (ihdlr.keyDownEvent()) {
+
+			// ESC exists the game
+			if (ihdlr.isKeyDown(SDL_SCANCODE_ESCAPE)) {
+				exit = true;
+				continue;
+			}
+
 		}
 
-		_state->update();
+		_little_wolf->update();
 
-		Uint64 frameTime = sdlutils().currRealTime() - startTime;
+		// the clear is not necessary since the texture we copy to the window occupies the whole screen
+		// sdlutils().clearRenderer();
+
+		_little_wolf->render();
+
+		sdlutils().presentRenderer();
+
+		Uint32 frameTime = sdlutils().currRealTime() - startTime;
 
 		if (frameTime < 10)
-			SDL_Delay(static_cast<Uint32>(10 - frameTime));
+			SDL_Delay(10 - frameTime);
 	}
 
 }

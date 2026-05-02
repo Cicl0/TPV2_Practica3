@@ -16,8 +16,12 @@
   ],
   
   "sounds" : [
-    { "id" : "laugh", "file" : "resources/sound/laugh.wav" },
-	{ "id" : "beat", "file" : "resources/sound/beat.wav" }
+    { "id" : "wall_hit", "file" : "resources/sound/wall_hit.wav" },
+    { "id" : "explosion", "file" : "resources/sound/explosion.wav" }
+  ],
+
+  "musics" : [
+    { "id" : "beat", "file" : "resources/sound/beat.wav" }
   ]
 
 }

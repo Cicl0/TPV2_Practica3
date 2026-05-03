@@ -4,7 +4,7 @@
 #include "../sdlutils/InputHandler.h"
 
 NewRoundState::NewRoundState(Game* game) :
-	_mngr(nullptr), _game(game) {
+	_game(game) {
 
 }
 
@@ -17,7 +17,7 @@ NewRoundState::update() {
 	auto& ihdlr = ih();
 
 	if (ihdlr.keyDownEvent() && ihdlr.isKeyDown(SDL_SCANCODE_RETURN)) {
-		_game->setState(Game::RUNNING);
+		_game->setState(State::RUNNING);
 		return;
 	}
 
@@ -32,9 +32,6 @@ NewRoundState::update() {
 
 void
 NewRoundState::enter() {
-	_mngr = _game->getMngr();
-
-	assert(_mngr != nullptr);
 }
 
 void

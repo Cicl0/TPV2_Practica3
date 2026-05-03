@@ -4,7 +4,7 @@
 #include "../sdlutils/InputHandler.h"
 
 PausedState::PausedState(Game* game) :
-	_mngr(nullptr), _game(game) {
+	_game(game) {
 
 }
 
@@ -20,7 +20,7 @@ PausedState::update() {
 		ihdlr.refresh();
 
 		if (ihdlr.keyDownEvent()) {
-			_game->setState(Game::RUNNING);
+			_game->setState(State::RUNNING);
 			return;
 		}
 
@@ -37,8 +37,6 @@ PausedState::update() {
 
 void
 PausedState::enter() {
-	_mngr = _game->getMngr();
-	assert(_mngr != nullptr);
 }
 
 void

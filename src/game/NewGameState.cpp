@@ -4,12 +4,11 @@
 #include "../sdlutils/InputHandler.h"
 
 NewGameState::NewGameState(Game* game) :
-	_mngr(nullptr), _game(game) {
+	_game(game) {
 
 }
 
 NewGameState::~NewGameState() {
-	delete _mngr;
 }
 
 void
@@ -17,7 +16,7 @@ NewGameState::update() {
 	auto& ihdlr = ih();
 
 	if (ihdlr.keyDownEvent()) {
-		_game->setState(Game::RUNNING);
+		_game->setState(State::RUNNING);
 		return;
 	}
 
@@ -32,13 +31,9 @@ NewGameState::update() {
 
 void
 NewGameState::enter() {
-	_mngr = _game->getMngr();
-
-	assert(_mngr != nullptr);
 
 	Message m;
 	m.id = _m_NEW_GAME;
-	_mngr->send(m);
 }
 
 void

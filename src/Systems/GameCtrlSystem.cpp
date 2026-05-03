@@ -26,15 +26,15 @@ void GameCtrlSystem::recieve(const Message& msg) {
 	switch (msg.id) {
 
 	case _m_GAME_OVER:
-		_game->setState(Game::GAMEOVER);
+		_game->setState(State::GAMEOVER);
 		break;
 
 	case _m_ROUND_OVER:
-		_game->setState(Game::NEWROUND);
+		_game->setState(State::NEWROUND);
 		break;
 
 	case _m_GAME_PAUSED:
-		_game->setState(Game::PAUSED);
+		_game->setState(State::PAUSED);
 		break;
 
 	default:

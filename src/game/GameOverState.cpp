@@ -18,7 +18,7 @@ GameOverState::update() {
 	auto& ihdlr = ih();
 
 	if (ihdlr.keyDownEvent() && ihdlr.isKeyDown(SDL_SCANCODE_RETURN)) {
-		_game->setState(Game::NEWGAME);
+		_game->setState(State::NEWGAME);
 		return;
 	}
 

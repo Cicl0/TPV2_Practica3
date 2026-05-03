@@ -14,7 +14,6 @@ public:
 	void enter() override;
 	void leave() override;
 private:
-	ecs::EntityManager* _mngr;
 	Game* _game;
 };
 

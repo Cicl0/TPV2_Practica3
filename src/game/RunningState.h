@@ -17,7 +17,6 @@ private:
 
 	void handleCollision();
 
-	ecs::EntityManager* _mngr;
 	Game* _game;
 	bool _needReset;
 	bool _end;

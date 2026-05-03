@@ -81,9 +81,6 @@
     <ClCompile Include="src\sdlutils\SDLUtils.cpp">
       <Filter>Source Files\SDLUtils</Filter>
     </ClCompile>
-    <ClCompile Include="src\sdlutils\sdlutils_demo.cpp">
-      <Filter>Source Files\SDLUtils</Filter>
-    </ClCompile>
     <ClCompile Include="src\sdlutils\SDLUtilsError.cpp">
       <Filter>Source Files\SDLUtils</Filter>
     </ClCompile>
@@ -96,9 +93,6 @@
     <ClCompile Include="src\json\JSON.cpp">
       <Filter>Source Files\JSON</Filter>
     </ClCompile>
-    <ClCompile Include="src\json\json_demo.cpp">
-      <Filter>Source Files\JSON</Filter>
-    </ClCompile>
     <ClCompile Include="src\json\JSONValue.cpp">
       <Filter>Source Files\JSON</Filter>
     </ClCompile>
@@ -107,6 +101,24 @@
     </ClCompile>
     <ClCompile Include="src\systems\ImmunitySystem.cpp">
       <Filter>Source Files\Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="src\game\GameOverState.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\game\NewGameState.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\game\NewRoundState.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\game\PausedState.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\game\RunningState.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\game\LittleWolf.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -227,9 +239,6 @@
     <ClInclude Include="src\json\JSON.h">
       <Filter>Header Files\JSON</Filter>
     </ClInclude>
-    <ClInclude Include="src\json\json_demo.h">
-      <Filter>Header Files\JSON</Filter>
-    </ClInclude>
     <ClInclude Include="src\json\JSONValue.h">
       <Filter>Header Files\JSON</Filter>
     </ClInclude>
@@ -241,6 +250,24 @@
     </ClInclude>
     <ClInclude Include="src\components\Image.h">
       <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\GameOverState.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\NewGameState.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\NewRoundState.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\PausedState.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\RunningState.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\LittleWolf.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -19,7 +19,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\ecs\EntityManager.cpp" />
     <ClCompile Include="src\game\Game.cpp" />
     <ClCompile Include="src\game\LittleWolf.cpp" />
     <ClCompile Include="src\json\JSON.cpp" />
@@ -29,33 +28,11 @@
     <ClCompile Include="src\sdlutils\SDLUtilsError.cpp" />
     <ClCompile Include="src\sdlutils\SoundEffect.cpp" />
     <ClCompile Include="src\sdlutils\Texture.cpp" />
-    <ClCompile Include="src\systems\CollisionsSystem.cpp" />
-    <ClCompile Include="src\systems\FoodSystem.cpp" />
-    <ClCompile Include="src\systems\GameCtrlSystem.cpp" />
-    <ClCompile Include="src\systems\GhostSystem.cpp" />
-    <ClCompile Include="src\systems\ImmunitySystem.cpp" />
-    <ClCompile Include="src\systems\PacManSystem.cpp" />
-    <ClCompile Include="src\systems\RenderSystem.cpp" />
-    <ClCompile Include="src\utils\Collisions.cpp" />
     <ClCompile Include="src\utils\Vector2D.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\components\FruitComponent.h" />
-    <ClInclude Include="src\components\Image.h" />
-    <ClInclude Include="src\components\ImageWithFrames.h" />
-    <ClInclude Include="src\components\PacManComponent.h" />
-    <ClInclude Include="src\components\Transform.h" />
-    <ClInclude Include="src\ecs\Component.h" />
-    <ClInclude Include="src\ecs\ecs.h" />
-    <ClInclude Include="src\ecs\Entity.h" />
-    <ClInclude Include="src\ecs\EntityManager.h" />
-    <ClInclude Include="src\ecs\messages.h" />
-    <ClInclude Include="src\ecs\messages_defs.h" />
-    <ClInclude Include="src\ecs\System.h" />
-    <ClInclude Include="src\game\ecs_defs.h" />
     <ClInclude Include="src\game\Game.h" />
     <ClInclude Include="src\game\LittleWolf.h" />
-    <ClInclude Include="src\game\messages_defs.h" />
     <ClInclude Include="src\json\JSON.h" />
     <ClInclude Include="src\json\JSONValue.h" />
     <ClInclude Include="src\sdlutils\Font.h" />
@@ -69,20 +46,6 @@
     <ClInclude Include="src\sdlutils\SoundManager.h" />
     <ClInclude Include="src\sdlutils\Texture.h" />
     <ClInclude Include="src\sdlutils\VirtualTimer.h" />
-    <ClInclude Include="src\systems\CollisionsSystem.h" />
-    <ClInclude Include="src\systems\FoodSystem.h" />
-    <ClInclude Include="src\systems\GameCtrlSystem.h" />
-    <ClInclude Include="src\systems\GhostSystem.h" />
-    <ClInclude Include="src\systems\ImmunitySystem.h" />
-    <ClInclude Include="src\systems\PacManSystem.h" />
-    <ClInclude Include="src\systems\RenderSystem.h" />
-    <ClInclude Include="src\utils\Collisions.h" />
-    <ClInclude Include="src\utils\DynamicBitSet.h" />
-    <ClInclude Include="src\utils\exceptions.h" />
-    <ClInclude Include="src\utils\GenID.h" />
-    <ClInclude Include="src\utils\mpl.h" />
-    <ClInclude Include="src\utils\ObjectPool.h" />
-    <ClInclude Include="src\utils\ptr_iterator.h" />
     <ClInclude Include="src\utils\Singleton.h" />
     <ClInclude Include="src\utils\Vector2D.h" />
   </ItemGroup>

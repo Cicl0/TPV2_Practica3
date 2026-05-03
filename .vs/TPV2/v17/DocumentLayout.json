@@ -11,44 +11,12 @@
       "RelativeMoniker": "D:0:0:{9948E05F-C760-4388-8502-49741C9A9509}|TPV2.vcxproj|solutionrelative:src\\game\\LittleWolf.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{9948E05F-C760-4388-8502-49741C9A9509}|TPV2.vcxproj|C:\\Users\\Alejandro\\Documents\\GitHub\\TPV2_Practica3\\src\\game\\NewRoundState.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{9948E05F-C760-4388-8502-49741C9A9509}|TPV2.vcxproj|solutionrelative:src\\game\\NewRoundState.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{9948E05F-C760-4388-8502-49741C9A9509}|TPV2.vcxproj|C:\\Users\\Alejandro\\Documents\\GitHub\\TPV2_Practica3\\src\\game\\Game.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{9948E05F-C760-4388-8502-49741C9A9509}|TPV2.vcxproj|solutionrelative:src\\game\\Game.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{9948E05F-C760-4388-8502-49741C9A9509}|TPV2.vcxproj|C:\\Users\\Alejandro\\Documents\\GitHub\\TPV2_Practica3\\src\\game\\RunningState.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{9948E05F-C760-4388-8502-49741C9A9509}|TPV2.vcxproj|solutionrelative:src\\game\\RunningState.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{9948E05F-C760-4388-8502-49741C9A9509}|TPV2.vcxproj|C:\\Users\\Alejandro\\Documents\\GitHub\\TPV2_Practica3\\src\\game\\NewRoundState.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{9948E05F-C760-4388-8502-49741C9A9509}|TPV2.vcxproj|solutionrelative:src\\game\\NewRoundState.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{9948E05F-C760-4388-8502-49741C9A9509}|TPV2.vcxproj|C:\\Users\\Alejandro\\Documents\\GitHub\\TPV2_Practica3\\src\\game\\NewGameState.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{9948E05F-C760-4388-8502-49741C9A9509}|TPV2.vcxproj|solutionrelative:src\\game\\NewGameState.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{9948E05F-C760-4388-8502-49741C9A9509}|TPV2.vcxproj|C:\\Users\\Alejandro\\Documents\\GitHub\\TPV2_Practica3\\src\\game\\NewGameState.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{9948E05F-C760-4388-8502-49741C9A9509}|TPV2.vcxproj|solutionrelative:src\\game\\NewGameState.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{9948E05F-C760-4388-8502-49741C9A9509}|TPV2.vcxproj|C:\\Users\\Alejandro\\Documents\\GitHub\\TPV2_Practica3\\src\\game\\RunningState.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{9948E05F-C760-4388-8502-49741C9A9509}|TPV2.vcxproj|solutionrelative:src\\game\\RunningState.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{9948E05F-C760-4388-8502-49741C9A9509}|TPV2.vcxproj|C:\\Users\\Alejandro\\Documents\\GitHub\\TPV2_Practica3\\src\\game\\PausedState.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{9948E05F-C760-4388-8502-49741C9A9509}|TPV2.vcxproj|solutionrelative:src\\game\\PausedState.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{9948E05F-C760-4388-8502-49741C9A9509}|TPV2.vcxproj|C:\\Users\\Alejandro\\Documents\\GitHub\\TPV2_Practica3\\src\\game\\Game.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{9948E05F-C760-4388-8502-49741C9A9509}|TPV2.vcxproj|solutionrelative:src\\game\\Game.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{9948E05F-C760-4388-8502-49741C9A9509}|TPV2.vcxproj|C:\\Users\\Alejandro\\Documents\\GitHub\\TPV2_Practica3\\src\\game\\GameOverState.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{9948E05F-C760-4388-8502-49741C9A9509}|TPV2.vcxproj|solutionrelative:src\\game\\GameOverState.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{9948E05F-C760-4388-8502-49741C9A9509}|TPV2.vcxproj|C:\\Users\\Alejandro\\Documents\\GitHub\\TPV2_Practica3\\src\\systems\\GameCtrlSystem.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
@@ -80,7 +48,7 @@
               "RelativeDocumentMoniker": "src\\game\\LittleWolf.h",
               "ToolTip": "C:\\Users\\Alejandro\\Documents\\GitHub\\TPV2_Practica3\\src\\game\\LittleWolf.h",
               "RelativeToolTip": "src\\game\\LittleWolf.h",
-              "ViewState": "AgIAAMYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAMYAAAAAAAAAAAAAANYAAAAlAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
               "WhenOpened": "2026-05-03T01:49:10.724Z",
               "EditorCaption": ""
@@ -101,93 +69,6 @@
             {
               "$type": "Document",
               "DocumentIndex": 2,
-              "Title": "NewRoundState.h",
-              "DocumentMoniker": "C:\\Users\\Alejandro\\Documents\\GitHub\\TPV2_Practica3\\src\\game\\NewRoundState.h",
-              "RelativeDocumentMoniker": "src\\game\\NewRoundState.h",
-              "ToolTip": "C:\\Users\\Alejandro\\Documents\\GitHub\\TPV2_Practica3\\src\\game\\NewRoundState.h",
-              "RelativeToolTip": "src\\game\\NewRoundState.h",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAAmAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
-              "WhenOpened": "2026-05-03T00:51:21.548Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 7,
-              "Title": "NewGameState.h",
-              "DocumentMoniker": "C:\\Users\\Alejandro\\Documents\\GitHub\\TPV2_Practica3\\src\\game\\NewGameState.h",
-              "RelativeDocumentMoniker": "src\\game\\NewGameState.h",
-              "ToolTip": "C:\\Users\\Alejandro\\Documents\\GitHub\\TPV2_Practica3\\src\\game\\NewGameState.h",
-              "RelativeToolTip": "src\\game\\NewGameState.h",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAAIAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
-              "WhenOpened": "2026-05-03T00:51:15.768Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 8,
-              "Title": "RunningState.h",
-              "DocumentMoniker": "C:\\Users\\Alejandro\\Documents\\GitHub\\TPV2_Practica3\\src\\game\\RunningState.h",
-              "RelativeDocumentMoniker": "src\\game\\RunningState.h",
-              "ToolTip": "C:\\Users\\Alejandro\\Documents\\GitHub\\TPV2_Practica3\\src\\game\\RunningState.h",
-              "RelativeToolTip": "src\\game\\RunningState.h",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABIAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
-              "WhenOpened": "2026-05-03T00:51:04.774Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "RunningState.cpp",
-              "DocumentMoniker": "C:\\Users\\Alejandro\\Documents\\GitHub\\TPV2_Practica3\\src\\game\\RunningState.cpp",
-              "RelativeDocumentMoniker": "src\\game\\RunningState.cpp",
-              "ToolTip": "C:\\Users\\Alejandro\\Documents\\GitHub\\TPV2_Practica3\\src\\game\\RunningState.cpp",
-              "RelativeToolTip": "src\\game\\RunningState.cpp",
-              "ViewState": "AgIAABgAAAAAAAAAAAAAAAcAAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
-              "WhenOpened": "2026-05-03T00:50:03.835Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 9,
-              "Title": "PausedState.cpp",
-              "DocumentMoniker": "C:\\Users\\Alejandro\\Documents\\GitHub\\TPV2_Practica3\\src\\game\\PausedState.cpp",
-              "RelativeDocumentMoniker": "src\\game\\PausedState.cpp",
-              "ToolTip": "C:\\Users\\Alejandro\\Documents\\GitHub\\TPV2_Practica3\\src\\game\\PausedState.cpp",
-              "RelativeToolTip": "src\\game\\PausedState.cpp",
-              "ViewState": "AgIAAB4AAAAAAAAAAAAAAAYAAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
-              "WhenOpened": "2026-05-03T00:09:09.635Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "NewRoundState.cpp",
-              "DocumentMoniker": "C:\\Users\\Alejandro\\Documents\\GitHub\\TPV2_Practica3\\src\\game\\NewRoundState.cpp",
-              "RelativeDocumentMoniker": "src\\game\\NewRoundState.cpp",
-              "ToolTip": "C:\\Users\\Alejandro\\Documents\\GitHub\\TPV2_Practica3\\src\\game\\NewRoundState.cpp",
-              "RelativeToolTip": "src\\game\\NewRoundState.cpp",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAnwAYAAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
-              "WhenOpened": "2026-05-03T00:09:03.586Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 11,
-              "Title": "GameOverState.cpp",
-              "DocumentMoniker": "C:\\Users\\Alejandro\\Documents\\GitHub\\TPV2_Practica3\\src\\game\\GameOverState.cpp",
-              "RelativeDocumentMoniker": "src\\game\\GameOverState.cpp",
-              "ToolTip": "C:\\Users\\Alejandro\\Documents\\GitHub\\TPV2_Practica3\\src\\game\\GameOverState.cpp",
-              "RelativeToolTip": "src\\game\\GameOverState.cpp",
-              "ViewState": "AgIAAAgAAAAAAAAAAADwvxQAAAAYAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
-              "WhenOpened": "2026-05-03T00:08:40.214Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
               "Title": "Game.cpp",
               "DocumentMoniker": "C:\\Users\\Alejandro\\Documents\\GitHub\\TPV2_Practica3\\src\\game\\Game.cpp",
               "RelativeDocumentMoniker": "src\\game\\Game.cpp",
@@ -200,7 +81,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 12,
+              "DocumentIndex": 4,
               "Title": "GameCtrlSystem.cpp",
               "DocumentMoniker": "C:\\Users\\Alejandro\\Documents\\GitHub\\TPV2_Practica3\\src\\Systems\\GameCtrlSystem.cpp",
               "RelativeDocumentMoniker": "src\\Systems\\GameCtrlSystem.cpp",
@@ -212,7 +93,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 10,
+              "DocumentIndex": 3,
               "Title": "Game.h",
               "DocumentMoniker": "C:\\Users\\Alejandro\\Documents\\GitHub\\TPV2_Practica3\\src\\game\\Game.h",
               "RelativeDocumentMoniker": "src\\game\\Game.h",
@@ -224,20 +105,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "NewGameState.cpp",
-              "DocumentMoniker": "C:\\Users\\Alejandro\\Documents\\GitHub\\TPV2_Practica3\\src\\game\\NewGameState.cpp",
-              "RelativeDocumentMoniker": "src\\game\\NewGameState.cpp",
-              "ToolTip": "C:\\Users\\Alejandro\\Documents\\GitHub\\TPV2_Practica3\\src\\game\\NewGameState.cpp",
-              "RelativeToolTip": "src\\game\\NewGameState.cpp",
-              "ViewState": "AgIAAAkAAAAAAAAAAAAAACMAAAAUAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
-              "WhenOpened": "2026-05-03T00:02:21.596Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 13,
+              "DocumentIndex": 5,
               "Title": "main.cpp",
               "DocumentMoniker": "C:\\Users\\Alejandro\\Documents\\GitHub\\TPV2_Practica3\\src\\main.cpp",
               "RelativeDocumentMoniker": "src\\main.cpp",

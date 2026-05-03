@@ -2,25 +2,54 @@
 
 #include <iostream>
 #include <fstream>
-
+#include <cstring>
 #include "game/Game.h"
+#include "sdlutils/SDLNetUtils.h"
+#include "sdlutils/TCPServer.h"
 
-int main(int, char**) {
+void server(Uint16 port) {
+	SDLNetUtils::init_SDLNet();
+	TCPServer server(10);
+	if (server.connect(port)) {
+		server.listen();
+	}
+	SDLNetUtils::close_SDLNet();
+}
 
+void client(const char *host, Uint16 port) {
 	try {
-		Game g;
-		g.init("resources/maps/little_wolf/map_1.json");
-		g.start();
-	} catch (const std::string &e) { // catch exceptions thrown as strings
+		if (Game::Init()) {
+			Game &g = *Game::Instance();
+			if (g.init_game(host, port)) {
+				g.start();
+			}
+			Game::Release();
+		}
+	} catch (const std::string &e) {
 		std::cerr << e << std::endl;
-	} catch (const char *e) { // catch exceptions thrown as char*
+	} catch (const char *e) {
 		std::cerr << e << std::endl;
-	} catch (const std::exception &e) { // catch exceptions thrown as a sub-type of std::exception
+	} catch (const std::exception &e) {
 		std::cerr << e.what();
 	} catch (...) {
 		std::cerr << "Caught an exception of unknown type ...";
 	}
+}
 
+int main(int argc, char **argv) {
+	if (argc == 3 && strcmp(argv[1], "server") == 0) {
+		server(static_cast<Uint16>(atoi(argv[2])));
+	} else if (argc == 4 && strcmp(argv[1], "client") == 0) {
+		client(argv[2], static_cast<Uint16>(atoi(argv[3])));
+	} else {
+		std::cout << "Usage: " << std::endl;
+		std::cout << "  " << argv[0] << " client host port " << std::endl;
+		std::cout << "  " << argv[0] << " server port " << std::endl;
+		std::cout << std::endl;
+		std::cout << "Example:" << std::endl;
+		std::cout << "  " << argv[0] << " server 2000" << std::endl;
+		std::cout << "  " << argv[0] << " client localhost 2000" << std::endl;
+	}
 	return 0;
 }
 

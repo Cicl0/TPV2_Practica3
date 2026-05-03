@@ -17,6 +17,9 @@
 
 class LittleWolf {
 public:
+class Networking; // Forward declaration
+
+
 
 	// a point in a 2D-plane
 	struct Point {
@@ -136,7 +139,14 @@ public:
 		return _yres;
 	}
 
+	// Integración con red
+	void setNetworking(Networking* net) { _networking = net; }
+	void syncPlayerState();
+	void syncShoot();
+	void syncDead();
+
 private:
+	Networking* _networking = nullptr;
 
 	// mark all (used) player alive
 	void bringAllToLife();

@@ -630,3 +630,22 @@ void LittleWolf::muteSound() {
 	SoundManager::Instance()->stop_all(0);
 	SoundManager::Instance()->set_master_volume(gain);
 }
+
+// Métodos de sincronización de red
+void LittleWolf::syncPlayerState() {
+	if (_networking) {
+		// Aquí se enviaría el estado del jugador usando _networking->send_player_state(...)
+	}
+}
+
+void LittleWolf::syncShoot() {
+	if (_networking) {
+		// Aquí se enviaría el evento de disparo usando _networking->send_shoot(...)
+	}
+}
+
+void LittleWolf::syncDead() {
+	if (_networking) {
+		// Aquí se enviaría el evento de muerte usando _networking->send_dead(...)
+	}
+}

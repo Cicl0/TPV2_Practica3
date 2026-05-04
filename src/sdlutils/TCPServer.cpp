@@ -1,8 +1,8 @@
-#include "TCPServer.h"
+﻿#include "TCPServer.h"
 
 #include <cassert>
 #include <csignal>
-#include "messages.h"
+#include "../game/messages.h"
 
 Uint16 TCPServer::shutDownTriggetPort = 0;
 bool TCPServer::done = true;

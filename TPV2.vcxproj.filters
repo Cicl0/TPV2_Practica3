@@ -13,17 +13,8 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Source Files\Components">
-      <UniqueIdentifier>{e392f124-730a-485b-b320-bdbe7b00f85b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Components">
-      <UniqueIdentifier>{ba5f2888-9f98-4c7b-9f78-a4b5f1403991}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\SDLUtils">
       <UniqueIdentifier>{5c4f6dca-86f2-4b26-8781-b8c3462c88d3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\ecs">
-      <UniqueIdentifier>{8c4ad985-770d-400d-8683-7c0c204913cd}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Systems">
       <UniqueIdentifier>{6a4cffc9-1b98-4944-960c-59d0f77dec9e}</UniqueIdentifier>
@@ -42,32 +33,11 @@
     <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\utils\Collisions.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\utils\Vector2D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\game\Game.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ecs\EntityManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\systems\CollisionsSystem.cpp">
-      <Filter>Source Files\Systems</Filter>
-    </ClCompile>
-    <ClCompile Include="src\systems\FoodSystem.cpp">
-      <Filter>Source Files\Systems</Filter>
-    </ClCompile>
-    <ClCompile Include="src\systems\GameCtrlSystem.cpp">
-      <Filter>Source Files\Systems</Filter>
-    </ClCompile>
-    <ClCompile Include="src\systems\PacManSystem.cpp">
-      <Filter>Source Files\Systems</Filter>
-    </ClCompile>
-    <ClCompile Include="src\systems\RenderSystem.cpp">
-      <Filter>Source Files\Systems</Filter>
     </ClCompile>
     <ClCompile Include="src\sdlutils\SDLUtils.cpp">
       <Filter>Source Files\SDLUtils</Filter>
@@ -87,35 +57,17 @@
     <ClCompile Include="src\json\JSONValue.cpp">
       <Filter>Source Files\JSON</Filter>
     </ClCompile>
-    <ClCompile Include="src\systems\GhostSystem.cpp">
-      <Filter>Source Files\Systems</Filter>
-    </ClCompile>
-    <ClCompile Include="src\systems\ImmunitySystem.cpp">
-      <Filter>Source Files\Systems</Filter>
-    </ClCompile>
     <ClCompile Include="src\game\LittleWolf.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\sdlutils\TCPServer.cpp">
+      <Filter>Source Files\SDLUtils</Filter>
+    </ClCompile>
+    <ClCompile Include="src\game\Networking.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\utils\Collisions.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\utils\DynamicBitSet.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\utils\exceptions.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\utils\GenID.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\utils\mpl.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\utils\ptr_iterator.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\utils\Singleton.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -123,24 +75,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\game\Game.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ecs\Entity.h">
-      <Filter>Header Files\ecs</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ecs\EntityManager.h">
-      <Filter>Header Files\ecs</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ecs\Component.h">
-      <Filter>Header Files\ecs</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ecs\messages.h">
-      <Filter>Header Files\ecs</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ecs\System.h">
-      <Filter>Header Files\ecs</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ecs\messages_defs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\sdlutils\VirtualTimer.h">
@@ -185,9 +119,13 @@
     <ClInclude Include="src\game\LittleWolf.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="src\utils\ObjectPool.h">
+    <ClInclude Include="src\sdlutils\TCPServer.h">
+      <Filter>Header Files\SDLUtils</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\messages.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\Networking.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

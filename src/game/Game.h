@@ -9,7 +9,7 @@ enum State {
 	GAMEOVER,
 	PAUSED,
 	RUNNING,
-	WAITING_RESTART // Nuevo estado: esperando reinicio
+	WAITING_RESTART
 };
 
 struct LWPlayer {
@@ -41,5 +41,10 @@ private:
 	Networking *_networking;
 	State _state;
 	bool _network_mode = false;
+
+	// --- New fields for restart countdown ---
+	bool _restartPending = false;
+	unsigned int _restartStartTime = 0; // ms
+	const float _restartDelay = 5.0f; // seconds
 };
 

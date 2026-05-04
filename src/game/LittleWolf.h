@@ -1,4 +1,4 @@
-// This file is part of the course TPV2@UCM - Samir Genaim
+﻿// This file is part of the course TPV2@UCM - Samir Genaim
 
 /*
  * The content of this class is based on https://glouw.com/2018/03/11/littlewolf.html
@@ -12,12 +12,16 @@
 #include <stdio.h>
 #include <string>
 #include <fstream>
+#include <vector>
 
 #include "../sdlutils/InputHandler.h"
-#include"../game/Networking.h"
+#include "Networking.h"
+
+class Networking; // Forward declaration
 
 class LittleWolf {
 public:
+
 	// a point in a 2D-plane
 	struct Point {
 		float x;
@@ -39,16 +43,16 @@ public:
 	// The information on the window/renderer, the size of the window, and a texture
 	// that we use to draw the walls, etc.
 	struct Gpu {
-		SDL_Window *window;
-		SDL_Renderer *renderer;
-		SDL_Texture *texture;
+		SDL_Window* window;
+		SDL_Renderer* renderer;
+		SDL_Texture* texture;
 		int xres;
 		int yres;
 	};
 
 	// when we lock a texture, we get an array of pixels where we can draw
 	struct Display {
-		Uint32 *pixels;
+		Uint32* pixels;
 		int width;
 		int pitch;
 	};
@@ -80,8 +84,8 @@ public:
 	// Representing a map, the user_walling is the walling provided by the user, and
 	// walling is a scaled up version
 	struct Map {
-		Uint8 **user_walling;
-		Uint8 **walling;
+		Uint8** user_walling;
+		Uint8** walling;
 
 		Uint16 user_walling_width;
 		Uint16 user_walling_height;
@@ -91,7 +95,7 @@ public:
 		Map() {
 			user_walling = walling = nullptr;
 			user_walling_width = user_walling_height = walling_width =
-					walling_height = 0u;
+				walling_height = 0u;
 		}
 
 		~Map() {
@@ -120,7 +124,7 @@ public:
 	bool addPlayer(Uint8 id);
 
 	// initialize the SDL window information
-	void init(SDL_Window *window, SDL_Renderer *render);
+	void init(SDL_Window* window, SDL_Renderer* render);
 
 	// render the walls, etc
 	void render();
@@ -136,14 +140,33 @@ public:
 		return _yres;
 	}
 
-		// Cuenta los jugadores vivos (ALIVE)
-	int countAlivePlayers() const;
-
 	// Integración con red
 	void setNetworking(Networking* net) { _networking = net; }
 	void syncPlayerState();
 	void syncShoot();
 	void syncDead();
+
+	// --- Añadidos para integración con Game/Networking ---
+	// Habilitar/Deshabilitar entrada (movimiento/disparo) — usado durante cuenta atrás
+	void setInputEnabled(bool enabled);
+
+	// Devuelve posiciones aleatorias para los jugadores conectados y los aplica localmente.
+	// Retorna un vector de tamaño _max_player con coordenadas válidas o {-1,-1} para entradas no usadas.
+	std::vector<Point> restartWithRandomPositions();
+
+	// Fija un mensaje que se muestra en pantalla durante la cuenta atrás
+	void setRestartMessage(const std::string& msg);
+
+	// Aplicar posiciones recibidas del máster (clientes llaman a esto cuando reciben RestartMsg)
+	void applyRestartPositions(const std::vector<Point>& positions);
+
+	// Devuelve número de jugadores vivos
+	int countAlivePlayers() const;
+
+	// Methods used by networking/master validation
+	bool applyPlayerState(const PlayerStateMsg& msg);
+	void fillPlayerStateForNetwork(Uint8 id, PlayerStateMsg& outMsg);
+	void setPlayerDead(Uint8 id);
 
 private:
 	Networking* _networking = nullptr;
@@ -159,26 +182,23 @@ private:
 
 	// Calculates wall size using the <corrected> ray to the wall.
 	Wall project(const int xres, const int yres, const float focal,
-			const Point corrected);
+		const Point corrected);
 
 	// Casts a ray from <where> in unit <direction> until a <walling> tile is hit.
-	Hit cast(const Point where, Point direction, Uint8 **walling,
-			bool ignore_players, bool ignore_deads);
+	Hit cast(const Point where, Point direction, Uint8** walling,
+		bool ignore_players, bool ignore_deads);
 
 	// Moves the player when w,a,s,d are held down. Handles collision detection for the walls.
-	bool shoot(Player &p);
-
-	//Vista aerea
-	bool _upper_view = false;
+	bool shoot(Player& p);
 
 	// Spins the player when keys grid_h,l are held down. When left-shit is held down the move is slower
-	inline void spin(Player &p);
+	inline void spin(Player& p);
 
 	// Moves the player when w,a,s,d are held down. Handles collision detection for the walls.
-	void move(Player &p);
+	void move(Player& p);
 
 	// Renders the entire scene from the <current player> perspective given a <map> and a software <gpu>.
-	void render_map(Player &p);
+	void render_map(Player& p);
 
 	// Renders the entire scene from the <current player> perspective given a <map> and a software <gpu>.
 	void render_upper_view();
@@ -253,33 +273,33 @@ private:
 
 	// Fast floor (math.grid_h is too slow).
 	inline int fl(const float x) {
-		return (int) x - (x < (int) x);
+		return (int)x - (x < (int)x);
 	}
 
 	// Fast ceil (math.grid_h is too slow).
 	inline int cl(const float x) {
-		return (int) x + (x > (int) x);
+		return (int)x + (x > (int)x);
 	}
 
 	// Returns a decimal value of the ascii tile value on the map.
-	inline Uint8 tile(const Point a, Uint8 **tiles) {
+	inline Uint8 tile(const Point a, Uint8** tiles) {
 		const int x = a.x;
 		const int y = a.y;
 		return tiles[y][x];
 	}
 
 	inline Display lock(const Gpu gpu) {
-		void *screen;
+		void* screen;
 		int pitch;
 		SDL_LockTexture(gpu.texture, NULL, &screen, &pitch);
-		const Display display = { (Uint32*) screen, pitch
-				/ (int) sizeof(Uint32), pitch };
+		const Display display = { (Uint32*)screen, pitch
+				/ (int)sizeof(Uint32), pitch };
 		return display;
 	}
 
 	// Places a pixels in gpu video memory.
 	inline void put(const Display display, const int x, const int y,
-			const Uint32 pixel) {
+		const Uint32 pixel) {
 		display.pixels[y + x * display.width] = pixel;
 	}
 
@@ -306,7 +326,7 @@ private:
 
 	// Floating point decimal.
 	inline float dec(const float x) {
-		return x - (int) x;
+		return x - (int)x;
 	}
 
 	// Returns a color value (RGBA) from a decimal tile value.
@@ -403,5 +423,14 @@ private:
 	// Mute sound flag
 	bool _mute;
 
-};
+	// --- New fields ---
+	// When false, movement/spin/shoot are ignored (used during restart countdown)
+	bool _input_enabled;
 
+	// Message to show during countdown/waiting
+	std::string _restart_message;
+
+	// Upper (aerial) view flag
+	bool _upper_view;
+
+};

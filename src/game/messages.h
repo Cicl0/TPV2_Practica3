@@ -3,7 +3,9 @@
 
 #include "../sdlutils/SDLNetUtils.h"
 #include <SDL_stdinc.h>
-#include "../utils/Vector2D.h"
+
+// máximo de jugadores (coincide con LittleWolf::_max_player)
+static constexpr size_t LW_MAX_PLAYERS = 10;
 
 // Tipos de mensaje básicos usados por el servidor
 enum MsgType : Uint8 {
@@ -58,9 +60,12 @@ struct DeadMsg {
 	_IMPL_SERIALIZATION_(id, shooter)
 };
 
-// Mensaje de reinicio
+// Mensaje de reinicio: posiciones para hasta LW_MAX_PLAYERS
 struct RestartMsg {
-	// aquí puedes ampliar con posiciones si lo deseas
-	Uint8 dummy; // solo para compatibilidad / alineamiento
-	_IMPL_SERIALIZATION_(dummy)
+	Uint8 type; // = _RESTART
+	// arrays de posiciones; si used[i]==0, la entrada se ignora
+	float x[LW_MAX_PLAYERS];
+	float y[LW_MAX_PLAYERS];
+	Uint8 used[LW_MAX_PLAYERS];
+	_IMPL_SERIALIZATION_(type, x, y, used)
 };

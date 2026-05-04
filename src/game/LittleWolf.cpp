@@ -1,4 +1,4 @@
-// Cuenta los jugadores vivos (ALIVE)
+﻿// Cuenta los jugadores vivos (ALIVE)
 
 // This file is part of the course TPV2@UCM - Samir Genaim
 
@@ -10,36 +10,42 @@
 #include <fstream>
 #include <memory>
 #include <string>
+#include <vector>
 
 #include "../json/JSONValue.h"
 #include "../sdlutils/InputHandler.h"
 #include "../sdlutils/SDLUtils.h"
 #include "../sdlutils/Texture.h"
 #include "../game/messages.h"
+#include "Networking.h"
 
 LittleWolf::LittleWolf() :
-		_show_help(true), //
-		_xres(), //
-		_yres(), //
-		_walling_width(), //
-		_walling_height(), //
-		_shoot_distace(), // the shoot distance -- note that it's wrt. to the walling size
-		_map(), //
-		_players(), //
-		_curr_player_id(0), //
-		_mute(false) { // we start with player 0
+	_show_help(true), //
+	_xres(), //
+	_yres(), //
+	_walling_width(), //
+	_walling_height(), //
+	_shoot_distace(), // the shoot distance -- note that it's wrt. to the walling size
+	_map(), //
+	_players(), //
+	_curr_player_id(0), //
+	_mute(false), // we start with player 0
+	_input_enabled(true),
+	_restart_message(),
+	_upper_view(false)
+{
 }
 
 LittleWolf::~LittleWolf() {
 	// nothing to delete, the wallings are deleted in the Map's destructor
 }
 
-void LittleWolf::init(SDL_Window *window, SDL_Renderer *render) {
+void LittleWolf::init(SDL_Window* window, SDL_Renderer* render) {
 	// for some reason it is created with a rotation of 90 degrees -- must be easier to
 	// manipulate coordinates
-	SDL_Texture *const texture = SDL_CreateTexture(sdlutils().renderer(),
-			SDL_PIXELFORMAT_XRGB8888, SDL_TEXTUREACCESS_STREAMING, _yres,
-			_xres);
+	SDL_Texture* const texture = SDL_CreateTexture(sdlutils().renderer(),
+		SDL_PIXELFORMAT_XRGB8888, SDL_TEXTUREACCESS_STREAMING, _yres,
+		_xres);
 
 	_gpu = { window, render, texture, _xres, _yres };
 
@@ -47,25 +53,29 @@ void LittleWolf::init(SDL_Window *window, SDL_Renderer *render) {
 
 void LittleWolf::update() {
 
-	auto &ihdlr = ih();
+	auto& ihdlr = ih();
 
 	if (ihdlr.keyDownEvent()) {
 
 		if (ihdlr.isKeyDown(SDL_SCANCODE_T)) { // toggle help
 			_show_help = !_show_help;
-		} else if (ihdlr.isKeyDown(SDL_SCANCODE_N)) { // N switches to the next player view
+		}
+		else if (ihdlr.isKeyDown(SDL_SCANCODE_N)) { // N switches to the next player view
 			switchToNextPlayer();
-		} else if (ihdlr.isKeyDown(SDL_SCANCODE_R)) { // R brings dead to life
+		}
+		else if (ihdlr.isKeyDown(SDL_SCANCODE_R)) { // R brings dead to life
 			bringAllToLife();
-		} else if (ihdlr.isKeyDown(SDL_SCANCODE_M)) { // M mutes/unmutes sound
+		}
+		else if (ihdlr.isKeyDown(SDL_SCANCODE_M)) { // M mutes/unmutes sound
 			muteSound();
-		} else if (ihdlr.isKeyDown(SDL_SCANCODE_V)) { // V alterna vista aérea
+		}
+		else if (ihdlr.isKeyDown(SDL_SCANCODE_V)) { // V alterna vista aérea
 			_upper_view = !_upper_view;
 		}
 
 	}
 
-	Player &p = _players[_curr_player_id];
+	Player& p = _players[_curr_player_id];
 
 	// dead player don't move/spin/shoot
 	if (p.state != ALIVE)
@@ -658,6 +668,154 @@ void LittleWolf::syncPlayerState() {
 		msg.state = p.state;
 		_networking->send_player_state(msg);
 	}
+}
+
+bool LittleWolf::applyPlayerState(const PlayerStateMsg & msg) {
+	if (msg.id >= _max_player) return false;
+	// si el slot no está en uso, ignorar
+	if (_players[msg.id].state == NOT_USED) return false;
+	
+	int nx = (int)msg.x;
+	int ny = (int)msg.y;
+	// comprobaciones básicas de límites
+	if (nx < 0 || nx >= _map.walling_width || ny < 0 || ny >= _map.walling_height)
+		return false;
+	
+	Uint8 tile = _map.walling[ny][nx];
+	Uint8 mytile = player_to_tile(msg.id);
+	
+	// si la celda está libre o es la nuestra, aceptamos
+	if (tile == 0 || tile == mytile) {
+			// mover en walling: borrar celda vieja y poner nueva
+		int ox = (int)_players[msg.id].where.x;
+		int oy = (int)_players[msg.id].where.y;
+		if (ox >= 0 && ox < _map.walling_width && oy >= 0 && oy < _map.walling_height) {
+			if (_map.walling[oy][ox] == mytile)
+					_map.walling[oy][ox] = 0;
+			
+		}
+		_map.walling[ny][nx] = mytile;
+		_players[msg.id].where.x = msg.x;
+		_players[msg.id].where.y = msg.y;
+		_players[msg.id].theta = msg.rot;
+		_players[msg.id].state = msg.state ? ALIVE : DEAD;
+		return true;
+		
+	}
+	else {
+		// ocupado por otro jugador -> reject
+		return false;
+		
+	}
+	
+}
+
+void LittleWolf::fillPlayerStateForNetwork(Uint8 id, PlayerStateMsg & outMsg) {
+	if (id >= _max_player) return;
+	Player & p = _players[id];
+	outMsg.id = p.id;
+	outMsg.x = p.where.x;
+	outMsg.y = p.where.y;
+	outMsg.rot = p.theta;
+	outMsg.vel = 0.0f;
+	outMsg.state = p.state;
+	
+}
+
+void LittleWolf::setPlayerDead(Uint8 id) {
+	if (id >= _max_player) return;
+	_players[id].state = DEAD;
+	
+}
+void LittleWolf::setInputEnabled(bool enabled) {
+	_input_enabled = enabled;
+}
+
+std::vector<LittleWolf::Point> LittleWolf::restartWithRandomPositions() {
+	std::vector<Point> positions(_max_player, { -1.0f, -1.0f });
+
+	// Clear previous player tiles from map (any tile >= 10)
+	for (int r = 0; r < _map.walling_height; ++r)
+		for (int c = 0; c < _map.walling_width; ++c)
+			if (_map.walling[r][c] >= 10)
+				_map.walling[r][c] = 0;
+
+	auto& rand = sdlutils().rand();
+
+	// For each connected player, find an empty cell
+	for (auto i = 0u; i < _max_player; ++i) {
+		if (_players[i].state != NOT_USED) {
+			// The search for an empty cell starts at a random position
+			Uint16 orow = rand.nextInt(0, _map.walling_height);
+			Uint16 ocol = rand.nextInt(0, _map.walling_width);
+
+			Uint16 row = orow;
+			Uint16 col = ocol;
+			bool found = false;
+			// linear search across grid until we find empty cell
+			for (auto tries = 0u; tries < (size_t)_map.walling_height * (size_t)_map.walling_width; ++tries) {
+				if (_map.walling[row][col] == 0) {
+					found = true;
+					break;
+				}
+				col = (col + 1) % _map.walling_width;
+				if (col == 0)
+					row = (row + 1) % _map.walling_height;
+			}
+
+			if (!found) continue; // extremely unlikely
+
+			_players[i].where = { col + 0.5f, row + 0.5f };
+			_players[i].velocity = { 0.0f, 0.0f };
+			_players[i].theta = 0.0f;
+			_players[i].state = ALIVE;
+
+			_map.walling[(int)_players[i].where.y][(int)_players[i].where.x] = player_to_tile(i);
+			positions[i] = _players[i].where;
+		}
+	}
+
+	// ensure current view points to a valid player
+	_curr_player_id = 0;
+	for (auto i = 0u; i < _max_player; ++i)
+		if (_players[i].state != NOT_USED) { _curr_player_id = i; break; }
+
+	return positions;
+}
+
+void LittleWolf::setRestartMessage(const std::string& msg) {
+	_restart_message = msg;
+}
+
+// Aplica las posiciones enviadas por el máster a todos los jugadores conectados.
+void LittleWolf::applyRestartPositions(const std::vector<Point>& positions) {
+	// Clear previous player tiles from map (any tile >= 10)
+	for (int r = 0; r < _map.walling_height; ++r)
+		for (int c = 0; c < _map.walling_width; ++c)
+			if (_map.walling[r][c] >= 10)
+				_map.walling[r][c] = 0;
+
+	// Apply positions and bring to life
+	for (auto i = 0u; i < _max_player && i < positions.size(); ++i) {
+		if (_players[i].state != NOT_USED && positions[i].x >= 0.0f && positions[i].y >= 0.0f) {
+			int px = static_cast<int>(positions[i].x);
+			int py = static_cast<int>(positions[i].y);
+			// bounds check
+			if (px < 0 || px >= _map.walling_width || py < 0 || py >= _map.walling_height)
+				continue;
+
+			_players[i].where = positions[i];
+			_players[i].velocity = { 0.0f, 0.0f };
+			_players[i].theta = 0.0f;
+			_players[i].state = ALIVE;
+			_map.walling[py][px] = player_to_tile(static_cast<Uint8>(i));
+		}
+	}
+
+	// Ensure current view points to a valid player
+	_curr_player_id = 0;
+	for (auto i = 0u; i < _max_player; ++i)
+		if (_players[i].state != NOT_USED) { _curr_player_id = i; break; }
 }
 
 void LittleWolf::syncShoot() {

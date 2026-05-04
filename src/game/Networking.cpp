@@ -6,6 +6,7 @@
 
 #include "../sdlutils/SDLNetUtils.h"
 #include <SDL_net.h>
+#include "../game/LittleWolf.h"
 
 Networking::Networking() : sock(nullptr), _client_Id(0), _master_Id(0) {}
 Networking::~Networking() { disconnect(); }
@@ -39,8 +40,10 @@ bool Networking::init(const char* host, Uint16 port) {
 	}
 
 	// store socket
-	void* sockets[1] = { stream };
+	sock = static_cast<void*>(stream);
 
+	// Wait server acceptance message
+	void* sockets[1] = { stream };
 	if (NET_WaitUntilInputAvailable(sockets, 1, 3000) <= 0) {
 		std::cerr << "Timeout esperando mensaje del servidor\n";
 		return false;
@@ -67,7 +70,6 @@ bool Networking::init(const char* host, Uint16 port) {
 			<< " master: " << (int)_master_Id << std::endl;
 	}
 	else {
-		// Unexpected, but attempt to deserialize as generic Msg
 		Msg m;
 		m.deserialize(buf.data);
 		std::cout << "Networking::init: unexpected first message type " << (int)m.type << std::endl;
@@ -91,7 +93,7 @@ void Networking::update() {
 
 	NET_StreamSocket* s = static_cast<NET_StreamSocket*>(sock);
 
-	// Try to receive a packet (SDLNetUtils::receive reads length header and payload)
+	// Try to receive a packet
 	SDLNetUtils::buff_t buf = SDLNetUtils::receive(s);
 
 	// If there was an error, assume connection closed
@@ -200,29 +202,67 @@ void Networking::handle_new_client(Uint8 id) {
 }
 
 void Networking::handle_disconnect(Uint8 id) {
-	// Por ahora solo debug
+	// Si el master ha cambiado, LittleWolf puede necesitar actualizar lógica local
 	(void)id;
 }
 
 void Networking::handle_player_state(const PlayerStateMsg& msg) {
-	// Por ahora solo debug; integrar con LittleWolf para actualizar estado
-	std::cout << "Networking: player state id=" << (int)msg.id
-		<< " x=" << msg.x << " y=" << msg.y << " rot=" << msg.rot
-		<< " state=" << (int)msg.state << std::endl;
+	// Si soy master, valido/aplico el estado en mi mapa y, si es necesario,
+	// envio la corrección (autoritativa) a todos.
+	if (is_master() && _lw) {
+		bool ok = _lw->applyPlayerState(msg);
+		if (!ok) {
+			// enviar la posición autoritativa de ese jugador de vuelta a todos
+			PlayerStateMsg corr;
+			Uint8 id = msg.id;
+			// construir corr desde el estado del máster
+			// obtenemos datos desde LittleWolf (acceder directamente)
+			// NOTA: LittleWolf expone applyPlayerState; añadimos método para obtener posición actual
+			// Para simplicidad pedimos a LittleWolf que rellene corr vía un helper
+			_lw->fillPlayerStateForNetwork(id, corr);
+			send_player_state(corr);
+		}
+	}
+	else {
+		// cliente normal: actualizar estado local según mensaje del master o de otros (servidor reenvía)
+		if (_lw) _lw->applyPlayerState(msg);
+	}
 }
 
 void Networking::handle_shoot(const ShootMsg& msg) {
 	std::cout << "Networking: shoot from " << (int)msg.id
 		<< " pos=(" << msg.x << "," << msg.y << ")" << std::endl;
+	// aplicar evento en LittleWolf si existe
+	if (_lw) {
+		// LittleWolf podría tener un handler de disparo; aquí podríamos invocarlo
+	}
 }
 
 void Networking::handle_dead(const DeadMsg& msg) {
 	std::cout << "Networking: dead id=" << (int)msg.id
 		<< " shooter=" << (int)msg.shooter << std::endl;
+	if (_lw) {
+		_lw->setPlayerDead(msg.id);
+	}
 }
 
 void Networking::handle_restart(const RestartMsg& msg) {
 	std::cout << "Networking: restart message received\n";
-	// Si RestartMsg incluye posiciones, aplicar aquí llamando a Game/LittleWolf.
-	(void)msg;
+	if (_lw) {
+		// construir vector de posiciones y aplicar
+		std::vector<LittleWolf::Point> positions;
+		positions.resize(LW_MAX_PLAYERS);
+		for (size_t i = 0; i < LW_MAX_PLAYERS; ++i) {
+			if (msg.used[i]) {
+				positions[i].x = msg.x[i];
+				positions[i].y = msg.y[i];
+			}
+			else {
+				positions[i].x = -1.0f;
+				positions[i].y = -1.0f;
+			}
+		}
+		_lw->applyRestartPositions(positions);
+		_lw->setInputEnabled(true);
+	}
 }

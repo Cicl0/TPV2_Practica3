@@ -31,39 +31,50 @@ Game::~Game() {
 
 	delete _little_wolf;
 }
+
 // Inicialización para modo red
-bool Game::init_game(const char *host, unsigned short port) {
-		_network_mode = true;
-		_networking = new Networking();
-		if (!_networking->init(host, port)) {
-			std::cerr << "Error inicializando red" << std::endl;
-			return false;
-		}
+bool Game::init_game(const char* host, unsigned short port) {
+	_network_mode = true;
+	_networking = new Networking();
+	if (!_networking->init(host, port)) {
+		std::cerr << "Error inicializando red" << std::endl;
+		return false;
+	}
 
 	_little_wolf = new LittleWolf();
-	// Aquí podrías cargar el mapa y jugadores según el estado de la red
-	// Por ahora, carga el mapa base
+	// conectar referencias entre Networking y LittleWolf
+	_little_wolf->setNetworking(_networking);
+	_networking->setLittleWolf(_little_wolf);
+
+	// Cargar el mapa (esto NO usa SDLUtils)
 	_little_wolf->load("resources/maps/little_wolf/map_0.json");
 
-		if (!SDLUtils::Init("[Little Wolf - Network]",
-				_little_wolf->get_xres(),
-				_little_wolf->get_yres(),
-				"resources/config/littlewolf.resources.json")) {
-			std::cerr << "Error inicializando SDLUtils" << std::endl;
-			return false;
-		}
+	// Inicializar SDLUtils e InputHandler antes de usar cualquier sdlutils().*
+	if (!SDLUtils::Init("[Little Wolf - Network]",
+		_little_wolf->get_xres(),
+		_little_wolf->get_yres(),
+		"resources/config/littlewolf.resources.json")) {
+		std::cerr << "Error inicializando SDLUtils" << std::endl;
+		return false;
+	}
 
-		if (!InputHandler::Init()) {
-			std::cerr << "Error inicializando InputHandler" << std::endl;
-			return false;
-		}
+	if (!InputHandler::Init()) {
+		std::cerr << "Error inicializando InputHandler" << std::endl;
+		return false;
+	}
 
-		_little_wolf->init(sdlutils().window(), sdlutils().renderer());
+	// Inicializar LittleWolf con la ventana/renderer ya creados
+	_little_wolf->init(sdlutils().window(), sdlutils().renderer());
 
-		Uint8 localId = _networking->get_client_id();
-		_little_wolf->addPlayer(localId);
+	// Registrar jugador local
+	Uint8 localId = _networking->get_client_id();
+	_little_wolf->addPlayer(localId);
 
-		return true;
+	// NOTA: la lógica de reinicio (restartWithRandomPositions / send_restart)
+	// debe ejecutarse solo cuando el máster decide reiniciar durante la partida.
+	// No la ejecutamos aquí en la inicialización para evitar usar sdlutils antes de tiempo.
+
+	return true;
 }
 
 void Game::start() {

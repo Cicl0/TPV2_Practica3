@@ -5,10 +5,11 @@ class LittleWolf;
 
 enum State {
 	NEWGAME,
-	NEWROUND, 
-	GAMEOVER, 
-	PAUSED, 
-	RUNNING
+	NEWROUND,
+	GAMEOVER,
+	PAUSED,
+	RUNNING,
+	WAITING_RESTART // Nuevo estado: esperando reinicio
 };
 
 struct LWPlayer {

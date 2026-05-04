@@ -14,13 +14,10 @@
 #include <fstream>
 
 #include "../sdlutils/InputHandler.h"
+#include"../game/Networking.h"
 
 class LittleWolf {
 public:
-class Networking; // Forward declaration
-
-
-
 	// a point in a 2D-plane
 	struct Point {
 		float x;
@@ -139,6 +136,9 @@ class Networking; // Forward declaration
 		return _yres;
 	}
 
+		// Cuenta los jugadores vivos (ALIVE)
+	int countAlivePlayers() const;
+
 	// Integración con red
 	void setNetworking(Networking* net) { _networking = net; }
 	void syncPlayerState();
@@ -167,6 +167,9 @@ private:
 
 	// Moves the player when w,a,s,d are held down. Handles collision detection for the walls.
 	bool shoot(Player &p);
+
+	//Vista aerea
+	bool _upper_view = false;
 
 	// Spins the player when keys grid_h,l are held down. When left-shit is held down the move is slower
 	inline void spin(Player &p);

@@ -1,6 +1,9 @@
+// Cuenta los jugadores vivos (ALIVE)
+
 // This file is part of the course TPV2@UCM - Samir Genaim
 
 #include "LittleWolf.h"
+
 
 #include <algorithm>
 #include <iostream>
@@ -12,6 +15,7 @@
 #include "../sdlutils/InputHandler.h"
 #include "../sdlutils/SDLUtils.h"
 #include "../sdlutils/Texture.h"
+#include "../game/messages.h"
 
 LittleWolf::LittleWolf() :
 		_show_help(true), //
@@ -55,6 +59,8 @@ void LittleWolf::update() {
 			bringAllToLife();
 		} else if (ihdlr.isKeyDown(SDL_SCANCODE_M)) { // M mutes/unmutes sound
 			muteSound();
+		} else if (ihdlr.isKeyDown(SDL_SCANCODE_V)) { // V alterna vista aérea
+			_upper_view = !_upper_view;
 		}
 
 	}
@@ -281,7 +287,7 @@ bool LittleWolf::addPlayer(Uint8 id) {
 void LittleWolf::render() {
 
 	// if the player is dead we the upper view, otherwise the normal view
-	if (_players[_curr_player_id].state == DEAD)
+	if (_players[_curr_player_id].state == DEAD || _upper_view)
 		render_upper_view();
 	else
 		render_map(_players[_curr_player_id]);
@@ -624,6 +630,14 @@ void LittleWolf::bringAllToLife() {
 	}
 }
 
+int LittleWolf::countAlivePlayers() const {
+	int count = 0;
+	for (int i = 0; i < _max_player; ++i) {
+		if (_players[i].state == ALIVE)
+			count++;
+	}
+	return count;
+}
 void LittleWolf::muteSound() {
 	_mute = !_mute;
 	float gain = _mute ? 0.0f : 1.0f;
@@ -634,7 +648,15 @@ void LittleWolf::muteSound() {
 // Métodos de sincronización de red
 void LittleWolf::syncPlayerState() {
 	if (_networking) {
-		// Aquí se enviaría el estado del jugador usando _networking->send_player_state(...)
+		Player &p = _players[_curr_player_id];
+		PlayerStateMsg msg;
+		msg.id = p.id;
+		msg.x = p.where.x;
+		msg.y = p.where.y;
+		msg.rot = p.theta;
+		msg.vel = 0; 
+		msg.state = p.state;
+		_networking->send_player_state(msg);
 	}
 }
 

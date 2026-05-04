@@ -33,34 +33,37 @@ Game::~Game() {
 }
 // Inicialización para modo red
 bool Game::init_game(const char *host, unsigned short port) {
-	_network_mode = true;
-	_networking = new Networking();
-	if (!_networking->init(host, port)) {
-		std::cerr << "Error inicializando red" << std::endl;
-		return false;
-	}
+		_network_mode = true;
+		_networking = new Networking();
+		if (!_networking->init(host, port)) {
+			std::cerr << "Error inicializando red" << std::endl;
+			return false;
+		}
 
 	_little_wolf = new LittleWolf();
 	// Aquí podrías cargar el mapa y jugadores según el estado de la red
 	// Por ahora, carga el mapa base
 	_little_wolf->load("resources/maps/little_wolf/map_0.json");
 
-	if (!SDLUtils::Init("[Little Wolf - Network]",
-			_little_wolf->get_xres(),
-			_little_wolf->get_yres(),
-			"resources/config/littlewolf.resources.json")) {
-		std::cerr << "Error inicializando SDLUtils" << std::endl;
-		return false;
-	}
+		if (!SDLUtils::Init("[Little Wolf - Network]",
+				_little_wolf->get_xres(),
+				_little_wolf->get_yres(),
+				"resources/config/littlewolf.resources.json")) {
+			std::cerr << "Error inicializando SDLUtils" << std::endl;
+			return false;
+		}
 
-	if (!InputHandler::Init()) {
-		std::cerr << "Error inicializando InputHandler" << std::endl;
-		return false;
-	}
+		if (!InputHandler::Init()) {
+			std::cerr << "Error inicializando InputHandler" << std::endl;
+			return false;
+		}
 
-	_little_wolf->init(sdlutils().window(), sdlutils().renderer());
-	// Los jugadores se sincronizarán por red
-	return true;
+		_little_wolf->init(sdlutils().window(), sdlutils().renderer());
+
+		Uint8 localId = _networking->get_client_id();
+		_little_wolf->addPlayer(localId);
+
+		return true;
 }
 
 void Game::start() {
@@ -70,33 +73,58 @@ void Game::start() {
 
 	auto &ihdlr = ih();
 
+	Uint32 restartStart = 0;
+	int restartCountdown = 5;
 	while (!exit) {
 		Uint32 startTime = sdlutils().currRealTime();
 
 		// refresh the input handler
 		ihdlr.refresh();
 
-		if (ihdlr.keyDownEvent()) {
+		// --- BLOQUEO DE CONTROLES DURANTE REINICIO ---
+		if (_state == WAITING_RESTART) {
+			// Mostrar mensaje de cuenta atrás
+			int y = sdlutils().height() / 2;
+			std::string msg = "The game will restart in " + std::to_string(restartCountdown) + " seconds";
+			Texture t(sdlutils().renderer(), msg, sdlutils().fonts().at("MFR12"), build_sdlcolor(0xFFFFFFFF));
+			t.render((sdlutils().width() - t.width()) / 2, y);
+			sdlutils().presentRenderer();
 
-			// ESC exists the game
+			if (restartStart == 0) restartStart = sdlutils().currRealTime();
+			Uint32 elapsed = (sdlutils().currRealTime() - restartStart) / 1000;
+			if (elapsed >= 5) {
+				
+				_state = RUNNING;
+				restartStart = 0;
+				restartCountdown = 5;
+			} else {
+				restartCountdown = 5 - elapsed;
+			}
+			SDL_Delay(50);
+			continue;
+		}
+
+		if (ihdlr.keyDownEvent()) {
 			if (ihdlr.isKeyDown(SDL_SCANCODE_ESCAPE)) {
 				exit = true;
 				continue;
 			}
+		}
 
+		// --- DETECTAR SI SOLO QUEDA 1 JUGADOR VIVO ---
+		int vivos = _little_wolf->countAlivePlayers();
+		if (vivos < 2 && _state == RUNNING) {
+			_state = WAITING_RESTART;
+			restartStart = 0;
+			restartCountdown = 5;
+			continue;
 		}
 
 		_little_wolf->update();
-
-		// the clear is not necessary since the texture we copy to the window occupies the whole screen
-		// sdlutils().clearRenderer();
-
 		_little_wolf->render();
-
 		sdlutils().presentRenderer();
 
 		Uint32 frameTime = sdlutils().currRealTime() - startTime;
-
 		if (frameTime < 10)
 			SDL_Delay(10 - frameTime);
 	}

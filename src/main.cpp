@@ -5,7 +5,7 @@
 #include <cstring>
 #include "game/Game.h"
 #include "sdlutils/SDLNetUtils.h"
-#include "sdlutils/TCPServer.h"
+#include "game/TCPServer.h"
 
 void server(Uint16 port) {
 	SDLNetUtils::init_SDLNet();
@@ -18,7 +18,7 @@ void server(Uint16 port) {
 
 void client(const char *host, Uint16 port) {
 	try {
-		if (Game::Init()) {
+		if (Game::init_game()) {
 			Game &g = *Game::Instance();
 			if (g.init_game(host, port)) {
 				g.start();

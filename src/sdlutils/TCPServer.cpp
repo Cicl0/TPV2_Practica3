@@ -139,51 +139,55 @@ void TCPServer::listen() {
 			// Check activity in the clients sockets
 			for (auto i = 1u; i < usedConn; i++) {
 
-				// Read a message
-				SDLNetUtils::buff_t buf = SDLNetUtils::receive(
-					static_cast<NET_StreamSocket*>(conn[i]));
+    				// Solo leer si ESTE socket tiene datos
+    				void* socketArray[1] = { conn[i] };
+    				if (NET_WaitUntilInputAvailable(socketArray, 1, 0) <= 0)
+        			continue;
 
-				if (!buf.error) { // if no error, we forward it to all (including the sender)
-					if (buf.size > 0) {
-						for (auto j = 1u; j < usedConn; j++) {
-							SDLNetUtils::send(
-								static_cast<NET_StreamSocket*>(conn[j]),
-								buf.data, buf.size);
-						}
-					}
-				}
-				else {
-					// the client has disconnected, or an error occurred, so we delete
-					// the corresponding socket form the clients array
+    // Read a message
+    SDLNetUtils::buff_t buf = SDLNetUtils::receive(
+        static_cast<NET_StreamSocket*>(conn[i]));
 
-					// first we find the client id
-					Uint8 j = 0;
-					while (j < maxClients
-						&& clients[j]
-						!= static_cast<NET_StreamSocket*>(conn[i]))
-						j++;
+    if (!buf.error) { // reenviar a todos (incluido emisor)
+        if (buf.size > 0) {
+            for (auto j = 1u; j < usedConn; j++) {
+                SDLNetUtils::send(
+                    static_cast<NET_StreamSocket*>(conn[j]),
+                    buf.data,
+                    buf.size);
+            }
+        }
+    }
+    else {
+        // Cliente desconectado
 
-					assert(j < maxClients);
+        Uint8 j = 0;
+        while (j < maxClients &&
+               clients[j] != static_cast<NET_StreamSocket*>(conn[i]))
+            j++;
 
-					std::cout << "Client " << (int)j << " disconnected!"
-						<< std::endl;
+        assert(j < maxClients);
 
-					// We must have found it, so we remove it
-					clients[j] = nullptr;
-					conn[i] = conn[usedConn - 1];
-					conn[usedConn - 1] = nullptr;
-					--usedConn;
+        std::cout << "Client " << (int)j << " disconnected!" << std::endl;
 
-					// Tell all clients, that client 'j' has disconnected
-					MsgWithMasterId m;
-					m.type = _CLIENT_DISCONNECTED;
-					m.clientId = j;
-					m.masterId = whoIsTheMaster();
-					for (auto j = 1u; j < usedConn; j++) {
-						SDLNetUtils::serialized_send(m,
-							static_cast<NET_StreamSocket*>(conn[j]));
-					}
-				}
+        clients[j] = nullptr;
+        conn[i] = conn[usedConn - 1];
+        conn[usedConn - 1] = nullptr;
+        --usedConn;
+
+        MsgWithMasterId m;
+        m.type = _CLIENT_DISCONNECTED;
+        m.clientId = j;
+        m.masterId = whoIsTheMaster();
+
+        			for (auto k = 1u; k < usedConn; k++) {
+            		SDLNetUtils::serialized_send(
+                	m,
+                	static_cast<NET_StreamSocket*>(conn[k]));
+        		}
+
+        			i--; // importante porque hemos compactado el array
+    			}
 			}
 		}
 	}

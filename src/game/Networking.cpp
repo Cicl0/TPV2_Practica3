@@ -88,27 +88,24 @@ void Networking::disconnect() {
 }
 
 void Networking::update() {
-	if (sock == nullptr)
-		return;
+	if (!sock) return;
 
 	NET_StreamSocket* s = static_cast<NET_StreamSocket*>(sock);
+	void* sockets[1] = { s };
 
-	// Try to receive a packet
-	SDLNetUtils::buff_t buf = SDLNetUtils::receive(s);
+	while (NET_WaitUntilInputAvailable(sockets, 1, 0) > 0) {
+		SDLNetUtils::buff_t buf = SDLNetUtils::receive(s);
 
-	// If there was an error, assume connection closed
-	if (buf.error) {
-		std::cerr << "Networking::update: socket error or disconnected\n";
-		disconnect();
-		return;
-	}
+		if (buf.error) {
+			disconnect();
+			return;
+		}
 
-	if (buf.size == 0)
-		return; // nothing received
+		if (buf.size == 0)
+			return;
 
-	// First byte is the message type
-	Uint8 type = buf.data[0];
-
+		Uint8 type = buf.data[0];
+	
 	switch (type) {
 	case _CONN_REQUEST_ACCEPTED: {
 		MsgWithMasterId m;
@@ -168,11 +165,17 @@ void Networking::update() {
 		std::cout << "Networking::update: unknown message type " << (int)m.type << std::endl;
 		break;
 	}
+		}
 	}
 }
 
 void Networking::send_player_state(const PlayerStateMsg& msg) {
 	if (!sock) return;
+
+	std::cout << "SEND player " << (int)msg.id
+	          << " x=" << msg.x
+	          << " y=" << msg.y << std::endl;
+
 	SDLNetUtils::serialized_send(const_cast<PlayerStateMsg&>(msg),
 		static_cast<NET_StreamSocket*>(sock));
 }
@@ -196,9 +199,9 @@ void Networking::send_restart(const RestartMsg& msg) {
 }
 
 void Networking::handle_new_client(Uint8 id) {
-	// Por ahora solo debug. Si quieres notificar al Game/LittleWolf
-	// añade un callback o referencia al constructor de Networking.
-	(void)id;
+    if (_lw) {
+        _lw->addPlayer(id);
+    }
 }
 
 void Networking::handle_disconnect(Uint8 id) {
@@ -207,26 +210,23 @@ void Networking::handle_disconnect(Uint8 id) {
 }
 
 void Networking::handle_player_state(const PlayerStateMsg& msg) {
-	// Si soy master, valido/aplico el estado en mi mapa y, si es necesario,
-	// envio la corrección (autoritativa) a todos.
-	if (is_master() && _lw) {
-		bool ok = _lw->applyPlayerState(msg);
-		if (!ok) {
-			// enviar la posición autoritativa de ese jugador de vuelta a todos
-			PlayerStateMsg corr;
-			Uint8 id = msg.id;
-			// construir corr desde el estado del máster
-			// obtenemos datos desde LittleWolf (acceder directamente)
-			// NOTA: LittleWolf expone applyPlayerState; añadimos método para obtener posición actual
-			// Para simplicidad pedimos a LittleWolf que rellene corr vía un helper
-			_lw->fillPlayerStateForNetwork(id, corr);
-			send_player_state(corr);
-		}
-	}
-	else {
-		// cliente normal: actualizar estado local según mensaje del master o de otros (servidor reenvía)
-		if (_lw) _lw->applyPlayerState(msg);
-	}
+	std::cout << "HANDLE PLAYER STATE CALLED" << std::endl;
+    if (is_master() && _lw) {
+        bool ok = _lw->applyPlayerState(msg);
+        PlayerStateMsg corr;
+        Uint8 id = msg.id;
+        // Siempre rellena el estado actual (autoritativo) del máster
+        _lw->fillPlayerStateForNetwork(id, corr);
+        // Y reenvía SIEMPRE el estado autoritativo a todos (incluido el que lo envió)
+        send_player_state(corr);
+		std::cout << "RECV player " << (int)msg.id
+          << " x=" << msg.x
+          << " y=" << msg.y << std::endl;
+    }
+    else {
+        // cliente normal: actualizar estado local según mensaje del master o de otros (servidor reenvía)
+        if (_lw) _lw->applyPlayerState(msg);
+    }
 }
 
 void Networking::handle_shoot(const ShootMsg& msg) {

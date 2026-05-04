@@ -68,11 +68,16 @@ bool Game::init_game(const char* host, unsigned short port) {
 
 	// Registrar jugador local
 	Uint8 localId = _networking->get_client_id();
-	_little_wolf->addPlayer(localId);
+	if (!_little_wolf->addPlayer(localId)) {
+    std::cout << "ERROR: couldn't add local player "
+              << (int)localId << std::endl;
+}
+else {
+    std::cout << "Added local player "
+              << (int)localId << std::endl;
+}
 
-	// NOTA: la lógica de reinicio (restartWithRandomPositions / send_restart)
-	// debe ejecutarse solo cuando el máster decide reiniciar durante la partida.
-	// No la ejecutamos aquí en la inicialización para evitar usar sdlutils antes de tiempo.
+	_state = RUNNING;
 
 	return true;
 }
@@ -86,6 +91,7 @@ void Game::start() {
 
 	Uint32 restartStart = 0;
 	int restartCountdown = 5;
+
 	while (!exit) {
 		Uint32 startTime = sdlutils().currRealTime();
 
@@ -121,6 +127,8 @@ void Game::start() {
 				continue;
 			}
 		}
+			
+		_networking->update();
 
 		// --- DETECTAR SI SOLO QUEDA 1 JUGADOR VIVO ---
 		int vivos = _little_wolf->countAlivePlayers();
@@ -131,6 +139,7 @@ void Game::start() {
 			continue;
 		}
 
+	
 		_little_wolf->update();
 		_little_wolf->render();
 		sdlutils().presentRenderer();

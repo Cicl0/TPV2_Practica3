@@ -34,6 +34,10 @@ LittleWolf::LittleWolf() :
 	_restart_message(),
 	_upper_view(false)
 {
+	for (int i = 0; i < _max_player; ++i) {
+    _players[i].state = NOT_USED;
+    _players[i].id = i;
+}
 }
 
 LittleWolf::~LittleWolf() {
@@ -52,7 +56,6 @@ void LittleWolf::init(SDL_Window* window, SDL_Renderer* render) {
 }
 
 void LittleWolf::update() {
-
 	auto& ihdlr = ih();
 
 	if (ihdlr.keyDownEvent()) {
@@ -77,13 +80,20 @@ void LittleWolf::update() {
 
 	Player& p = _players[_curr_player_id];
 
-	// dead player don't move/spin/shoot
+	if (_networking) 
+    	syncPlayerState();
+
+	if (!_input_enabled)
+		return;
+
 	if (p.state != ALIVE)
 		return;
 
 	spin(p);  // handle spinning
 	move(p);  // handle moving
 	shoot(p); // handle shooting
+
+
 }
 
 void LittleWolf::load(std::string filename) {
@@ -660,6 +670,7 @@ void LittleWolf::syncPlayerState() {
 	if (_networking) {
 		Player &p = _players[_curr_player_id];
 		PlayerStateMsg msg;
+		msg.type = _PLAYER_STATE;
 		msg.id = p.id;
 		msg.x = p.where.x;
 		msg.y = p.where.y;
@@ -672,8 +683,10 @@ void LittleWolf::syncPlayerState() {
 
 bool LittleWolf::applyPlayerState(const PlayerStateMsg & msg) {
 	if (msg.id >= _max_player) return false;
-	// si el slot no está en uso, ignorar
-	if (_players[msg.id].state == NOT_USED) return false;
+
+	if (_players[msg.id].state == NOT_USED) {
+    	addPlayer(msg.id);
+	}
 	
 	int nx = (int)msg.x;
 	int ny = (int)msg.y;
@@ -698,7 +711,8 @@ bool LittleWolf::applyPlayerState(const PlayerStateMsg & msg) {
 		_players[msg.id].where.x = msg.x;
 		_players[msg.id].where.y = msg.y;
 		_players[msg.id].theta = msg.rot;
-		_players[msg.id].state = msg.state ? ALIVE : DEAD;
+		_players[msg.id].state = static_cast<PlayerState>(msg.state);
+
 		return true;
 		
 	}
@@ -713,6 +727,7 @@ bool LittleWolf::applyPlayerState(const PlayerStateMsg & msg) {
 void LittleWolf::fillPlayerStateForNetwork(Uint8 id, PlayerStateMsg & outMsg) {
 	if (id >= _max_player) return;
 	Player & p = _players[id];
+	outMsg.type = _PLAYER_STATE;
 	outMsg.id = p.id;
 	outMsg.x = p.where.x;
 	outMsg.y = p.where.y;

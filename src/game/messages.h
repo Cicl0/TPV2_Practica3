@@ -37,32 +37,35 @@ struct MsgWithMasterId {
 
 // Mensaje de estado de jugador
 struct PlayerStateMsg {
+	Uint8 type = _PLAYER_STATE;
 	Uint8 id;
 	float x, y;
 	float rot;
 	float vel;
 	Uint8 state; // 0 = muerto, 1 = vivo
-	_IMPL_SERIALIZATION_(id, x, y, rot, vel, state)
+	_IMPL_SERIALIZATION_(type, id, x, y, rot, vel, state)
 };
 
 // Mensaje de disparo
 struct ShootMsg {
+	Uint8 type = _SHOOT;
 	Uint8 id;
 	float x, y;
 	float dir_x, dir_y;
-	_IMPL_SERIALIZATION_(id, x, y, dir_x, dir_y)
+	_IMPL_SERIALIZATION_(type, id, x, y, dir_x, dir_y)
 };
 
 // Mensaje de muerte
 struct DeadMsg {
+	Uint8 type = _DEAD;
 	Uint8 id;
 	Uint8 shooter;
-	_IMPL_SERIALIZATION_(id, shooter)
+	_IMPL_SERIALIZATION_(type, id, shooter)
 };
 
 // Mensaje de reinicio: posiciones para hasta LW_MAX_PLAYERS
 struct RestartMsg {
-	Uint8 type; // = _RESTART
+	Uint8 type; 
 	// arrays de posiciones; si used[i]==0, la entrada se ignora
 	float x[LW_MAX_PLAYERS];
 	float y[LW_MAX_PLAYERS];

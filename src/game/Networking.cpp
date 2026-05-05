@@ -172,10 +172,6 @@ void Networking::update() {
 void Networking::send_player_state(const PlayerStateMsg& msg) {
 	if (!sock) return;
 
-	std::cout << "SEND player " << (int)msg.id
-	          << " x=" << msg.x
-	          << " y=" << msg.y << std::endl;
-
 	SDLNetUtils::serialized_send(const_cast<PlayerStateMsg&>(msg),
 		static_cast<NET_StreamSocket*>(sock));
 }
@@ -210,7 +206,6 @@ void Networking::handle_disconnect(Uint8 id) {
 }
 
 void Networking::handle_player_state(const PlayerStateMsg& msg) {
-	std::cout << "HANDLE PLAYER STATE CALLED" << std::endl;
     if (is_master() && _lw) {
         bool ok = _lw->applyPlayerState(msg);
         PlayerStateMsg corr;
@@ -219,9 +214,6 @@ void Networking::handle_player_state(const PlayerStateMsg& msg) {
         _lw->fillPlayerStateForNetwork(id, corr);
         // Y reenvía SIEMPRE el estado autoritativo a todos (incluido el que lo envió)
         send_player_state(corr);
-		std::cout << "RECV player " << (int)msg.id
-          << " x=" << msg.x
-          << " y=" << msg.y << std::endl;
     }
     else {
         // cliente normal: actualizar estado local según mensaje del master o de otros (servidor reenvía)
@@ -230,8 +222,6 @@ void Networking::handle_player_state(const PlayerStateMsg& msg) {
 }
 
 void Networking::handle_shoot(const ShootMsg& msg) {
-	std::cout << "Networking: shoot from " << (int)msg.id
-		<< " pos=(" << msg.x << "," << msg.y << ")" << std::endl;
 	// aplicar evento en LittleWolf si existe
 	if (_lw) {
 		// LittleWolf podría tener un handler de disparo; aquí podríamos invocarlo
@@ -239,8 +229,6 @@ void Networking::handle_shoot(const ShootMsg& msg) {
 }
 
 void Networking::handle_dead(const DeadMsg& msg) {
-	std::cout << "Networking: dead id=" << (int)msg.id
-		<< " shooter=" << (int)msg.shooter << std::endl;
 	if (_lw) {
 		_lw->setPlayerDead(msg.id);
 	}

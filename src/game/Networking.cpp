@@ -206,19 +206,7 @@ void Networking::handle_disconnect(Uint8 id) {
 }
 
 void Networking::handle_player_state(const PlayerStateMsg& msg) {
-    if (is_master() && _lw) {
-        bool ok = _lw->applyPlayerState(msg);
-        PlayerStateMsg corr;
-        Uint8 id = msg.id;
-        // Siempre rellena el estado actual (autoritativo) del máster
-        _lw->fillPlayerStateForNetwork(id, corr);
-        // Y reenvía SIEMPRE el estado autoritativo a todos (incluido el que lo envió)
-        send_player_state(corr);
-    }
-    else {
-        // cliente normal: actualizar estado local según mensaje del master o de otros (servidor reenvía)
-        if (_lw) _lw->applyPlayerState(msg);
-    }
+	if (_lw) _lw->applyPlayerState(msg);
 }
 
 void Networking::handle_shoot(const ShootMsg& msg) {

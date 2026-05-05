@@ -80,9 +80,6 @@ void LittleWolf::update() {
 
 	Player& p = _players[_curr_player_id];
 
-	if (_networking) 
-    	syncPlayerState();
-
 	if (!_input_enabled)
 		return;
 
@@ -93,6 +90,8 @@ void LittleWolf::update() {
 	move(p);  // handle moving
 	shoot(p); // handle shooting
 
+	if (_networking) 
+    	syncPlayerState();
 
 }
 
@@ -273,7 +272,7 @@ bool LittleWolf::addPlayer(Uint8 id) {
 	Uint16 row = orow;
 	Uint16 col = (ocol + 1) % _map.walling_width;
 	while (!((orow == row) && (ocol == col)) && _map.walling[row][col] != 0) {
-		col = (col + 1) % _map.user_walling_width;
+		col = (col + 1) % _map.walling_width;
 		if (col == 0)
 			row = (row + 1) % _map.walling_height;
 	}
@@ -298,8 +297,6 @@ bool LittleWolf::addPlayer(Uint8 id) {
 	// note that player <id> is stored in the map as player_to_tile(id) -- which is id+10
 	_map.walling[(int) p.where.y][(int) p.where.x] = player_to_tile(id);
 	_players[id] = p;
-
-	_curr_player_id = id;
 
 	return true;
 }
@@ -658,6 +655,16 @@ int LittleWolf::countAlivePlayers() const {
 	}
 	return count;
 }
+
+int LittleWolf::countUsedPlayers() const {
+	int count = 0;
+	for (int i = 0; i < _max_player; ++i) {
+		if (_players[i].state != NOT_USED)
+			count++;
+	}
+	return count;
+}
+
 void LittleWolf::muteSound() {
 	_mute = !_mute;
 	float gain = _mute ? 0.0f : 1.0f;
@@ -789,12 +796,6 @@ std::vector<LittleWolf::Point> LittleWolf::restartWithRandomPositions() {
 			positions[i] = _players[i].where;
 		}
 	}
-
-	// ensure current view points to a valid player
-	_curr_player_id = 0;
-	for (auto i = 0u; i < _max_player; ++i)
-		if (_players[i].state != NOT_USED) { _curr_player_id = i; break; }
-
 	return positions;
 }
 
@@ -826,11 +827,6 @@ void LittleWolf::applyRestartPositions(const std::vector<Point>& positions) {
 			_map.walling[py][px] = player_to_tile(static_cast<Uint8>(i));
 		}
 	}
-
-	// Ensure current view points to a valid player
-	_curr_player_id = 0;
-	for (auto i = 0u; i < _max_player; ++i)
-		if (_players[i].state != NOT_USED) { _curr_player_id = i; break; }
 }
 
 void LittleWolf::syncShoot() {

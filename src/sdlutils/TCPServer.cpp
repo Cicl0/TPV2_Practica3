@@ -148,9 +148,10 @@ void TCPServer::listen() {
     SDLNetUtils::buff_t buf = SDLNetUtils::receive(
         static_cast<NET_StreamSocket*>(conn[i]));
 
-    if (!buf.error) { // reenviar a todos (incluido emisor)
+    if (!buf.error) { 
         if (buf.size > 0) {
             for (auto j = 1u; j < usedConn; j++) {
+				if (j == i) continue;
                 SDLNetUtils::send(
                     static_cast<NET_StreamSocket*>(conn[j]),
                     buf.data,

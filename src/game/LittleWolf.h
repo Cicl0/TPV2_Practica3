@@ -163,10 +163,15 @@ public:
 	// Devuelve número de jugadores vivos
 	int countAlivePlayers() const;
 
+	//Devuelve numero de jugadores conectados 
+	int countUsedPlayers() const;
+
 	// Methods used by networking/master validation
 	bool applyPlayerState(const PlayerStateMsg& msg);
 	void fillPlayerStateForNetwork(Uint8 id, PlayerStateMsg& outMsg);
 	void setPlayerDead(Uint8 id);
+
+	void setCurrentPlayer(Uint8 id) { _curr_player_id = id; };
 
 private:
 	Networking* _networking = nullptr;

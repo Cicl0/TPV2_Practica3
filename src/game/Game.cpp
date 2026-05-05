@@ -71,6 +71,8 @@ bool Game::init_game(const char* host, unsigned short port) {
 	if (!_little_wolf->addPlayer(localId)) {
     std::cout << "ERROR: couldn't add local player "
               << (int)localId << std::endl;
+			  
+	_little_wolf->setCurrentPlayer(localId);
 }
 else {
     std::cout << "Added local player "
@@ -130,9 +132,10 @@ void Game::start() {
 			
 		_networking->update();
 
-		// --- DETECTAR SI SOLO QUEDA 1 JUGADOR VIVO ---
+		//Miramos si solo hay 1 jugador ALIVE
+		int conectados = _little_wolf->countUsedPlayers();
 		int vivos = _little_wolf->countAlivePlayers();
-		if (vivos < 2 && _state == RUNNING) {
+		if (conectados >= 2 && vivos < 2 && _state == RUNNING) {
 			_state = WAITING_RESTART;
 			restartStart = 0;
 			restartCountdown = 5;

@@ -69,15 +69,14 @@ bool Game::init_game(const char* host, unsigned short port) {
 	// Registrar jugador local
 	Uint8 localId = _networking->get_client_id();
 	if (!_little_wolf->addPlayer(localId)) {
-    std::cout << "ERROR: couldn't add local player "
-              << (int)localId << std::endl;
-			  
+		std::cout << "ERROR: couldn't add local player "
+		          << (int)localId << std::endl;
+		return false;
+	}
+
 	_little_wolf->setCurrentPlayer(localId);
-}
-else {
-    std::cout << "Added local player "
-              << (int)localId << std::endl;
-}
+	std::cout << "Added local player "
+	          << (int)localId << std::endl;
 
 	_state = RUNNING;
 

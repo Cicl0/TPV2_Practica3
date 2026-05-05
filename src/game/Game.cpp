@@ -99,8 +99,10 @@ void Game::start() {
 		// refresh the input handler
 		ihdlr.refresh();
 
-		// --- BLOQUEO DE CONTROLES DURANTE REINICIO ---
+		//Bloqueamos los controles
 		if (_state == WAITING_RESTART) {
+			_networking->update();
+
 			// Mostrar mensaje de cuenta atrás
 			int y = sdlutils().height() / 2;
 			std::string msg = "The game will restart in " + std::to_string(restartCountdown) + " seconds";
@@ -111,6 +113,26 @@ void Game::start() {
 			if (restartStart == 0) restartStart = sdlutils().currRealTime();
 			Uint32 elapsed = (sdlutils().currRealTime() - restartStart) / 1000;
 			if (elapsed >= 5) {
+				//El master reinicia posiciones 
+				if (_networking->is_master()) {
+					auto positions = _little_wolf->restartWithRandomPositions();
+					RestartMsg restartMsg;
+					restartMsg.type = _RESTART;
+					for (size_t i = 0; i < LW_MAX_PLAYERS; ++i) {
+						if (positions[i].x >= 0.0f && positions[i].y >= 0.0f) {
+							restartMsg.used[i] = 1;
+							restartMsg.x[i] = positions[i].x;
+							restartMsg.y[i] = positions[i].y;
+						}
+						else {
+							restartMsg.used[i] = 0;
+							restartMsg.x[i] = -1.0f;
+							restartMsg.y[i] = -1.0f;
+						}
+					}
+					_networking->send_restart(restartMsg);
+					_little_wolf->applyRestartPositions(positions);
+				}
 				
 				_state = RUNNING;
 				restartStart = 0;

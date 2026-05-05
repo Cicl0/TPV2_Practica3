@@ -596,32 +596,8 @@ bool LittleWolf::shoot(Player &p) {
 
 		// play gun shot sound
 		sdlutils().soundEffects().at("gunshot").play("se");
-
-		// we shoot in several directions, because with projection what you see is not exact
-		for (float d = -0.05; d <= 0.05; d += 0.005) {
-
-			// search which tile was hit
-			const Line camera = rotate(p.fov, p.theta + d);
-			Point direction = lerp(camera, 0.5f);
-			direction.x = direction.x / mag(direction);
-			direction.y = direction.y / mag(direction);
-			const Hit hit = cast(p.where, direction, _map.walling, false, true);
-
-#ifdef _DEBUG
-			printf(
-					"Shoot by player %d hit a tile with value %d! at distance %f\n",
-					p.id, hit.tile, mag(sub(p.where, hit.where)));
-#endif
-
-			// if we hit a tile with a player id and the distance from that tile is smaller
-			// than shoot_distace, we mark the player as dead
-			if (hit.tile > 9 && mag(sub(p.where, hit.where)) < _shoot_distace) {
-				Uint8 id = tile_to_player(hit.tile);
-				_players[id].state = DEAD;
-				sdlutils().soundEffects().at("pain").play("se");
-				return true;
-			}
-		}
+		syncShoot();
+		return true;
 	}
 	return false;
 }
@@ -679,12 +655,28 @@ void LittleWolf::syncPlayerState() {
 		PlayerStateMsg msg;
 		msg.type = _PLAYER_STATE;
 		msg.id = p.id;
+		msg.prev_x = p.where.x - p.velocity.x;
+		msg.prev_y = p.where.y - p.velocity.y;
 		msg.x = p.where.x;
 		msg.y = p.where.y;
 		msg.rot = p.theta;
-		msg.vel = 0; 
+		msg.vel = mag(p.velocity);
 		msg.state = p.state;
 		_networking->send_player_state(msg);
+	}
+}
+
+void LittleWolf::resendState() {
+	if (!_networking || !_networking->is_master())
+		return;
+
+	// Si hay conflicto, el master reenvía el estado válido actual
+	for (auto i = 0u; i < _max_player; ++i) {
+		if (_players[i].state == NOT_USED)
+			continue;
+		PlayerStateMsg outMsg;
+		fillPlayerStateForNetwork(static_cast<Uint8>(i), outMsg);
+		_networking->send_player_state(outMsg);
 	}
 }
 
@@ -695,11 +687,26 @@ bool LittleWolf::applyPlayerState(const PlayerStateMsg & msg) {
     	addPlayer(msg.id);
 	}
 	
+	int prevX = (int)msg.prev_x;
+	int prevY = (int)msg.prev_y;
 	int nx = (int)msg.x;
 	int ny = (int)msg.y;
 	// comprobaciones básicas de límites
-	if (nx < 0 || nx >= _map.walling_width || ny < 0 || ny >= _map.walling_height)
+	if (nx < 0 || nx >= _map.walling_width || ny < 0 || ny >= _map.walling_height) {
+		resendState();
 		return false;
+	}
+
+	if (_networking && _networking->is_master()) {
+		if (prevX < 0 || prevX >= _map.walling_width || prevY < 0 || prevY >= _map.walling_height) {
+			resendState();
+			return false;
+		}
+		if (_map.walling[prevY][prevX] != player_to_tile(msg.id)) {
+			resendState();
+			return false;
+		}
+	}
 	
 	Uint8 tile = _map.walling[ny][nx];
 	Uint8 mytile = player_to_tile(msg.id);
@@ -720,15 +727,43 @@ bool LittleWolf::applyPlayerState(const PlayerStateMsg & msg) {
 		_players[msg.id].theta = msg.rot;
 		_players[msg.id].state = static_cast<PlayerState>(msg.state);
 
-		return true;
-		
+		return true;		
 	}
 	else {
 		// ocupado por otro jugador -> reject
-		return false;
-		
+		resendState();
+		return false;		
 	}
 	
+}
+
+bool LittleWolf::applyShoot(const ShootMsg& msg) {
+	if (msg.id >= _max_player) return false;
+	if (msg.x < 0.0f || msg.y < 0.0f) return false;
+
+	Point where = { msg.x, msg.y };
+	Point direction = { msg.dir_x, msg.dir_y };
+	float dirMag = mag(direction);
+	if (dirMag <= 0.0f) return false;
+	direction.x /= dirMag;
+	direction.y /= dirMag;
+
+	const Hit hit = cast(where, direction, _map.walling, false, true);
+	if (hit.tile > 9 && mag(sub(where, hit.where)) < _shoot_distace) {
+		Uint8 id = tile_to_player(hit.tile);
+		_players[id].state = DEAD;
+		DeadMsg deadMsg;
+		deadMsg.type = _DEAD;
+		deadMsg.id = id;
+		deadMsg.shooter = msg.id;
+		if (_networking) {
+			_networking->send_dead(deadMsg);
+		}
+		sdlutils().soundEffects().at("pain").play("se");
+		return true;
+	}
+
+	return false;
 }
 
 void LittleWolf::fillPlayerStateForNetwork(Uint8 id, PlayerStateMsg & outMsg) {
@@ -736,6 +771,8 @@ void LittleWolf::fillPlayerStateForNetwork(Uint8 id, PlayerStateMsg & outMsg) {
 	Player & p = _players[id];
 	outMsg.type = _PLAYER_STATE;
 	outMsg.id = p.id;
+	outMsg.prev_x = p.where.x;
+	outMsg.prev_y = p.where.y;
 	outMsg.x = p.where.x;
 	outMsg.y = p.where.y;
 	outMsg.rot = p.theta;
@@ -748,6 +785,31 @@ void LittleWolf::setPlayerDead(Uint8 id) {
 	if (id >= _max_player) return;
 	_players[id].state = DEAD;
 	
+}
+
+void LittleWolf::removePlayer(Uint8 id) {
+	if (id >= _max_player) return;
+	if (_players[id].state == NOT_USED) return;
+
+	int x = (int)_players[id].where.x;
+	int y = (int)_players[id].where.y;
+	if (x >= 0 && x < _map.walling_width && y >= 0 && y < _map.walling_height) {
+		if (_map.walling[y][x] == player_to_tile(id))
+			_map.walling[y][x] = 0;
+	}
+
+	_players[id].state = NOT_USED;
+	_players[id].velocity = { 0.0f, 0.0f };
+
+	if (_curr_player_id == id) {
+		for (auto i = 0u; i < _max_player; ++i) {
+			if (_players[i].state != NOT_USED) {
+				_curr_player_id = static_cast<Uint8>(i);
+				return;
+			}
+		}
+		_curr_player_id = 0;
+	}
 }
 void LittleWolf::setInputEnabled(bool enabled) {
 	_input_enabled = enabled;
@@ -831,7 +893,19 @@ void LittleWolf::applyRestartPositions(const std::vector<Point>& positions) {
 
 void LittleWolf::syncShoot() {
 	if (_networking) {
-		// Aquí se enviaría el evento de disparo usando _networking->send_shoot(...)
+		Player &p = _players[_curr_player_id];
+		ShootMsg msg;
+		msg.type = _SHOOT;
+		msg.id = p.id;
+		msg.x = p.where.x;
+		msg.y = p.where.y;
+		Point direction = turn({ 1.0f, 0.0f }, p.theta);
+		msg.dir_x = direction.x;
+		msg.dir_y = direction.y;
+		_networking->send_shoot(msg);
+		if (_networking->is_master()) {
+			applyShoot(msg);
+		}
 	}
 }
 

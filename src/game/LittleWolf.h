@@ -168,8 +168,11 @@ public:
 
 	// Methods used by networking/master validation
 	bool applyPlayerState(const PlayerStateMsg& msg);
+	bool applyShoot(const ShootMsg& msg);
 	void fillPlayerStateForNetwork(Uint8 id, PlayerStateMsg& outMsg);
 	void setPlayerDead(Uint8 id);
+	void removePlayer(Uint8 id);
+	void resendState();
 
 	void setCurrentPlayer(Uint8 id) { _curr_player_id = id; };
 

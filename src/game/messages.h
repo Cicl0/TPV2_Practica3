@@ -39,11 +39,12 @@ struct MsgWithMasterId {
 struct PlayerStateMsg {
 	Uint8 type = _PLAYER_STATE;
 	Uint8 id;
+	float prev_x, prev_y;
 	float x, y;
 	float rot;
 	float vel;
 	Uint8 state; // 0 = muerto, 1 = vivo
-	_IMPL_SERIALIZATION_(type, id, x, y, rot, vel, state)
+	_IMPL_SERIALIZATION_(type, id, prev_x, prev_y, x, y, rot, vel, state)
 };
 
 // Mensaje de disparo

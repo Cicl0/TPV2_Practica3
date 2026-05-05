@@ -201,8 +201,10 @@ void Networking::handle_new_client(Uint8 id) {
 }
 
 void Networking::handle_disconnect(Uint8 id) {
-	// Si el master ha cambiado, LittleWolf puede necesitar actualizar lógica local
-	(void)id;
+	if (_lw) {
+		// Al desconectar, eliminamos el jugador del estado local para no contarlo como conectado.
+		_lw->removePlayer(id);
+	}
 }
 
 void Networking::handle_player_state(const PlayerStateMsg& msg) {
@@ -210,9 +212,9 @@ void Networking::handle_player_state(const PlayerStateMsg& msg) {
 }
 
 void Networking::handle_shoot(const ShootMsg& msg) {
-	// aplicar evento en LittleWolf si existe
-	if (_lw) {
-		// LittleWolf podría tener un handler de disparo; aquí podríamos invocarlo
+	if (_lw && is_master()) {
+		// Solo el master decide si el disparo provoca una muerte.
+		_lw->applyShoot(msg);
 	}
 }
 

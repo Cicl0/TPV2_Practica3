@@ -10,8 +10,7 @@
 Game::Game() :
 	_little_wolf(nullptr),
 	_networking(nullptr),
-	_state(NEWGAME),
-	_network_mode(false)
+	_state(NEWGAME)
 {
 }
 
@@ -34,7 +33,6 @@ Game::~Game() {
 
 // Inicialización para modo red
 bool Game::init_game(const char* host, unsigned short port) {
-	_network_mode = true;
 	_networking = new Networking();
 	if (!_networking->init(host, port)) {
 		std::cerr << "Error inicializando red" << std::endl;
@@ -94,7 +92,7 @@ void Game::start() {
 	int restartCountdown = 5;
 
 	while (!exit) {
-		Uint32 startTime = sdlutils().currRealTime();
+		Uint64 startTime = sdlutils().currRealTime();
 
 		// refresh the input handler
 		ihdlr.refresh();
@@ -107,11 +105,11 @@ void Game::start() {
 			int y = sdlutils().height() / 2;
 			std::string msg = "The game will restart in " + std::to_string(restartCountdown) + " seconds";
 			Texture t(sdlutils().renderer(), msg, sdlutils().fonts().at("MFR12"), build_sdlcolor(0xFFFFFFFF));
-			t.render((sdlutils().width() - t.width()) / 2, y);
+			t.render(static_cast<float>((sdlutils().width() - t.width()) / 2), static_cast<float>(y));
 			sdlutils().presentRenderer();
 
-			if (restartStart == 0) restartStart = sdlutils().currRealTime();
-			Uint32 elapsed = (sdlutils().currRealTime() - restartStart) / 1000;
+			if (restartStart == 0) restartStart = static_cast<Uint32>(sdlutils().currRealTime());
+			Uint32 elapsed = static_cast<Uint32>((sdlutils().currRealTime() - restartStart) / 1000);
 			if (elapsed >= 5) {
 				//El master reinicia posiciones 
 				if (_networking->is_master()) {
@@ -168,9 +166,9 @@ void Game::start() {
 		_little_wolf->render();
 		sdlutils().presentRenderer();
 
-		Uint32 frameTime = sdlutils().currRealTime() - startTime;
+		Uint64 frameTime = sdlutils().currRealTime() - startTime;
 		if (frameTime < 10)
-			SDL_Delay(10 - frameTime);
+			SDL_Delay(static_cast<Uint32>(10 - frameTime));
 	}
 
 }

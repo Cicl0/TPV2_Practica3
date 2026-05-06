@@ -12,7 +12,7 @@ Networking::Networking() : sock(nullptr), _client_Id(0), _master_Id(0) {}
 Networking::~Networking() { disconnect(); }
 
 bool Networking::init(const char* host, Uint16 port) {
-	// Resolve hostname
+
 	NET_Address* addr = NET_ResolveHostname(host);
 	if (!addr) {
 		std::cerr << "Networking::init: NET_ResolveHostname returned nullptr\n";
@@ -24,7 +24,7 @@ bool Networking::init(const char* host, Uint16 port) {
 		return false;
 	}
 
-	// Create client
+	// Creamos cliente
 	NET_StreamSocket* stream = NET_CreateClient(addr, port);
 	NET_UnrefAddress(addr);
 	if (!stream) {
@@ -32,17 +32,15 @@ bool Networking::init(const char* host, Uint16 port) {
 		return false;
 	}
 
-	// Wait until connected (non-blocking style with timeout)
 	if (NET_WaitUntilConnected(stream, 3000) != NET_SUCCESS) {
 		std::cerr << "Networking::init: connection to " << host << ":" << port << " failed\n";
 		NET_DestroyStreamSocket(stream);
 		return false;
 	}
 
-	// store socket
 	sock = static_cast<void*>(stream);
 
-	// Wait server acceptance message
+	// Esperamos el mensaje de aceptacion del server
 	void* sockets[1] = { stream };
 	if (NET_WaitUntilInputAvailable(sockets, 1, 3000) <= 0) {
 		std::cerr << "Timeout esperando mensaje del servidor\n";
@@ -58,7 +56,7 @@ bool Networking::init(const char* host, Uint16 port) {
 		return false;
 	}
 
-	// Inspect first byte to know message type
+	// Vemos el type para comprobar que mensaje es
 	Uint8 type = buf.data[0];
 
 	if (type == _CONN_REQUEST_ACCEPTED) {
@@ -202,7 +200,7 @@ void Networking::handle_new_client(Uint8 id) {
 
 void Networking::handle_disconnect(Uint8 id) {
 	if (_lw) {
-		// Al desconectar, eliminamos el jugador del estado local para no contarlo como conectado.
+		// Al desconectar, eliminamos el jugador del estado local para no contarlo como conectado
 		_lw->removePlayer(id);
 	}
 }
@@ -213,7 +211,7 @@ void Networking::handle_player_state(const PlayerStateMsg& msg) {
 
 void Networking::handle_shoot(const ShootMsg& msg) {
 	if (_lw && is_master()) {
-		// Solo el master decide si el disparo provoca una muerte.
+		// Solo el master decide si el disparo provoca muerte
 		_lw->applyShoot(msg);
 	}
 }

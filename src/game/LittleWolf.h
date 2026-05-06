@@ -74,6 +74,7 @@ public:
 		Uint8 id;            // the id
 		Line fov;            // focal view
 		Point where;         // current position (wrt. to the grid)
+		Point prev_where;    // previous position used for network sync
 		Point velocity;      // current velocity
 		float speed;         // maximum speed
 		float acceleration;  // acceleration
@@ -144,7 +145,6 @@ public:
 	void setNetworking(Networking* net) { _networking = net; }
 	void syncPlayerState();
 	void syncShoot();
-	void syncDead();
 
 	// --- Añadidos para integración con Game/Networking ---
 	// Habilitar/Deshabilitar entrada (movimiento/disparo) — usado durante cuenta atrás
@@ -179,11 +179,12 @@ public:
 private:
 	Networking* _networking = nullptr;
 
+	void clearPlayerTiles();
+	void placePlayerAt(Uint8 id, const Point& position);
+	void fillPlayerStateFromPlayer(const Player& p, PlayerStateMsg& outMsg);
+
 	// mark all (used) player alive
 	void bringAllToLife();
-
-	// switch to the view of the next player
-	void switchToNextPlayer();
 
 	// mute/unmute sound
 	void muteSound();
@@ -285,14 +286,14 @@ private:
 	}
 
 	// Fast ceil (math.grid_h is too slow).
-	inline int cl(const float x) {
-		return (int)x + (x > (int)x);
+	inline float cl(const float x) {
+		return static_cast<float>(static_cast<int>(x) + (x > static_cast<int>(x)));
 	}
 
 	// Returns a decimal value of the ascii tile value on the map.
 	inline Uint8 tile(const Point a, Uint8** tiles) {
-		const int x = a.x;
-		const int y = a.y;
+		const int x = static_cast<int>(a.x);
+		const int y = static_cast<int>(a.y);
 		return tiles[y][x];
 	}
 
@@ -431,7 +432,7 @@ private:
 	// Mute sound flag
 	bool _mute;
 
-	// --- New fields ---
+
 	// When false, movement/spin/shoot are ignored (used during restart countdown)
 	bool _input_enabled;
 

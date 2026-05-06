@@ -24,7 +24,7 @@ struct LWPlayer {
 	char name[11];
 };
 
-class Networking; // Forward declaration
+class Networking; 
 
 class Game {
 public:
@@ -42,11 +42,5 @@ private:
 	LittleWolf *_little_wolf;
 	Networking *_networking;
 	State _state;
-	bool _network_mode = false;
-
-	// --- New fields for restart countdown ---
-	bool _restartPending = false;
-	unsigned int _restartStartTime = 0; // ms
-	const float _restartDelay = 5.0f; // seconds
 };
 

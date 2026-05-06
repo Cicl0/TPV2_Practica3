@@ -85,17 +85,13 @@ bool TCPServer::connect(const Uint16 port) {
 void TCPServer::listen() {
 
 	while (!done) {
-		// Sleep for a long while, or until someone connects to the server
+		// Espera hasta que alguien entre al servidor
 		if (NET_WaitUntilInputAvailable(conn, usedConn, SDL_MAX_SINT32) > 0) {
 
-			// in case of shutdown wake-up
+			// si se cierra
 			if (done)
 				continue;
 
-			// We don't know exactly in which socket we had activity, so we check
-			// them all.
-
-			// If we have activity in 'serv', we accept the connection
 			NET_StreamSocket* client = nullptr;
 			if (NET_AcceptClient(serv, &client) && client != nullptr) {
 
@@ -106,22 +102,19 @@ void TCPServer::listen() {
 
 					assert(j < maxClients);
 
-					// we must have found one, because (usedConn - 1 < maxClients)
-
 					conn[usedConn] = clients[j] = client;
 					std::cout << "New client assigned id " << (int)j
 						<< std::endl;
 					++usedConn;
 
-					// Send acceptance message
 					MsgWithMasterId m;
 					m.type = _CONN_REQUEST_ACCEPTED;
 					m.clientId = j;
 					m.masterId = whoIsTheMaster();
 					SDLNetUtils::serialized_send(m, client);
 
-					// Tell all, except the new client, that there is a new client
-					m.type = _CLIENT_CONNECTED; // the rest of the message remain as before
+					// Comunica a los otros clientes que hay uno nuevo conectado
+					m.type = _CLIENT_CONNECTED; 
 					for (auto i = 1u; i < usedConn - 1; i++) {
 						if (client != static_cast<NET_StreamSocket*>(conn[i]))
 							SDLNetUtils::serialized_send(m,
@@ -129,22 +122,19 @@ void TCPServer::listen() {
 					}
 				}
 				else {
-					// Reject connection request
 					Msg m;
 					m.type = _CONN_REQUEST_REJECTED;
 					SDLNetUtils::serialized_send(m, client);
 				}
 			}
 
-			// Check activity in the clients sockets
 			for (auto i = 1u; i < usedConn; i++) {
 
-    				// Solo leer si ESTE socket tiene datos
     				void* socketArray[1] = { conn[i] };
     				if (NET_WaitUntilInputAvailable(socketArray, 1, 0) <= 0)
         			continue;
 
-    // Read a message
+    // Lee mensaje
     SDLNetUtils::buff_t buf = SDLNetUtils::receive(
         static_cast<NET_StreamSocket*>(conn[i]));
 
@@ -181,15 +171,12 @@ void TCPServer::listen() {
         m.clientId = j;
         m.masterId = whoIsTheMaster();
 
-        			for (auto k = 1u; k < usedConn; k++) {
-            		SDLNetUtils::serialized_send(
-                	m,
-                	static_cast<NET_StreamSocket*>(conn[k]));
-        		}
+        for (auto k = 1u; k < usedConn; k++) 
+            SDLNetUtils::serialized_send( m, static_cast<NET_StreamSocket*>(conn[k]));
 
-        			i--; // importante porque hemos compactado el array
-    			}
-			}
+    		   i--;
+    		}
+		  }
 		}
 	}
 
@@ -205,21 +192,20 @@ void TCPServer::shutdown() {
 	Msg m;
 
 	m.type = _SERVER_SHUTDOWN;
-	// Dispose all client sockets
+
 	for (auto i = 1u; i < usedConn; i++) {
 		SDLNetUtils::serialized_send(m,
 			static_cast<NET_StreamSocket*>(conn[i]));
 		NET_DestroyStreamSocket(static_cast<NET_StreamSocket*>(conn[i]));
 	}
 
-	// Close the server's master socket
 	NET_DestroyServer(serv);
 
 	serv = nullptr;
 }
 
 int TCPServer::whoIsTheMaster() {
-	// the master is the one with the minimum id (the first non-null in the clients array)
+	// el master es siempre el de menor id
 	for (auto i = 0u; i < maxClients; i++) {
 		if (clients[i] != nullptr)
 			return i;

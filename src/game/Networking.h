@@ -22,7 +22,7 @@ public:
     void send_dead(const DeadMsg& msg);
     void send_restart(const RestartMsg& msg);
 
-    // permitir que Networking invoque métodos de LittleWolf (applyRestartPositions, applyPlayerState, ...)
+    // permitir que Networking invoque metodos de LittleWolf
     void setLittleWolf(LittleWolf* lw) { _lw = lw; }
 
 private:
